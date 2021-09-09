@@ -15,17 +15,18 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
 TENSORFLOW_NS = tf-$(TENSORFLOW_GIT_REV)
-TENSORFLOW_DIR = $(BUILD_CACHE)/$(TENSORFLOW_NS)/
+TENSORFLOW_DIR = $(BUILD_CACHE)/$(TENSORFLOW_NS)
 TENSORFLOW_XLA_EXTENSION_NS = tensorflow/compiler/xla/extension
 TENSORFLOW_XLA_EXTENSION_DIR = $(TENSORFLOW_DIR)/$(TENSORFLOW_XLA_EXTENSION_NS)
 
 $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_EXLA_NS)/xla_extension: symlinks
 	cd $(TENSORFLOW_DIR) && \
-		bazel build $(BAZEL_FLAGS) $(XLA_EXTENSION_FLAGS) //$(TENSORFLOW_XLA_EXTENSION_NS):xla_extension
+		bazel build $(BAZEL_FLAGS) $(XLA_EXTENSION_FLAGS) //$(TENSORFLOW_XLA_EXTENSION_NS):xla_extension && \
+                cp -f $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_XLA_EXTENSION_NS)/xla_extension.tar.gz $(ROOT_DIR)/xla_extension.tar.gz
 
 
 symlinks: $(TENSORFLOW_DIR)
-	@ rm -f $(TENSORFLOW_EXLA_DIR)
+	@ rm -f $(TENSORFLOW_XLA_EXTENSION_DIR)
 	@ ln -s "$(ROOT_DIR)/extension" $(TENSORFLOW_XLA_EXTENSION_DIR)
 
 # Print Tensorflow Dir
@@ -46,3 +47,4 @@ clean:
 	cd $(TENSORFLOW_DIR) && bazel clean --expunge
 	rm -f $(TENSORFLOW_XLA_EXTENSION_DIR)
 	rm -rf $(TENSORFLOW_DIR)
+	rm -rf $(ROOT_DIR)/xla_extension.tar.gz

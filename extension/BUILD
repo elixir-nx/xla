@@ -97,11 +97,31 @@ genrule(
         d="$${d#*external/farmhash_archive/src}"
         d="$${d#*external/$${extname}/}"
       fi
+      # Remap llvm paths
+      d="$${d/llvm\/include\/llvm/llvm}"
+      d="$${d/llvm\/include\/llvm-c/llvm-c}"
+      # Remap google path
+      d="$${d/src\/google/google}"
+      # Remap grpc paths
+      d="$${d/include\/grpc/grpc}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done
     """,
   )
+
+# This genrule remaps libxla_extension.so to lib/libxla_extension.so
+genrule(
+  name = "xla_extension_lib",
+  srcs = [
+    ":libxla_extension.so",
+  ],
+  outs = ["lib"],
+  cmd = """
+    mkdir $@
+    mv $(location :libxla_extension.so) $@
+  """
+)
 
 pkg_tar(
   name = "xla_extension",
@@ -109,10 +129,10 @@ pkg_tar(
   mode = "0644",
   package_dir = "xla_extension",
   srcs = [
-    ":libxla_extension.so",
+    ":xla_extension_lib",
     ":xla_extension_headers",
   ],
   remap_paths = {
-    "libxla_extension.so" : "lib/libxla_extension.so"
+    "./xla_extension/include/include/": "./xla_extension/include/",
   }
 )
