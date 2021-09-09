@@ -3,7 +3,7 @@ TEMP ?= $(HOME)/.cache
 
 # Public configuration
 BUILD_MODE ?= opt # can also be dbg
-BUILD_CACHE ?= $(TEMP)/exla
+BUILD_CACHE ?= $(TEMP)/xla_extension
 TENSORFLOW_GIT_REPO ?= https://github.com/tensorflow/tensorflow.git
 
 # TODO: Should this instead be a stable version source?
@@ -12,7 +12,7 @@ TENSORFLOW_GIT_REV ?= 54dee6dd8d47b6e597f4d3f85b6fb43fd5f50f82
 
 # Private configuration
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-BAZEL_FLAGS = --define "framework_shared_object=false" -c $(EXLA_MODE)
+BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
 TENSORFLOW_NS = tf-$(TENSORFLOW_GIT_REV)
 TENSORFLOW_DIR = $(BUILD_CACHE)/$(TENSORFLOW_NS)/
