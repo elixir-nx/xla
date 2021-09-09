@@ -132,7 +132,4 @@ pkg_tar(
     ":xla_extension_lib",
     ":xla_extension_headers",
   ],
-  remap_paths = {
-    "./xla_extension/include/include/": "./xla_extension/include/",
-  }
 )
