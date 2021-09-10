@@ -12,6 +12,7 @@ TENSORFLOW_GIT_REV ?= 54dee6dd8d47b6e597f4d3f85b6fb43fd5f50f82
 
 # Private configuration
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+TARGET_DIR ?= $(ROOT_DIR)/priv
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
 TENSORFLOW_NS = tf-$(TENSORFLOW_GIT_REV)
@@ -21,8 +22,9 @@ TENSORFLOW_XLA_EXTENSION_DIR = $(TENSORFLOW_DIR)/$(TENSORFLOW_XLA_EXTENSION_NS)
 
 $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_EXLA_NS)/xla_extension: symlinks
 	cd $(TENSORFLOW_DIR) && \
-		bazel build $(BAZEL_FLAGS) $(XLA_EXTENSION_FLAGS) //$(TENSORFLOW_XLA_EXTENSION_NS):xla_extension && \
-                cp -f $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_XLA_EXTENSION_NS)/xla_extension.tar.gz $(ROOT_DIR)/xla_extension.tar.gz
+		bazel build $(BAZEL_FLAGS) $(XLA_EXTENSION_FLAGS) $(XLA_EXTENSION_INTERNAL_FLAGS) //$(TENSORFLOW_XLA_EXTENSION_NS):xla_extension && \
+		mkdir -p $(TARGET_DIR) && \
+		cp -f $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_XLA_EXTENSION_NS)/xla_extension.tar.gz $(TARGET_DIR)/xla_extension.tar.gz
 
 
 symlinks: $(TENSORFLOW_DIR)
