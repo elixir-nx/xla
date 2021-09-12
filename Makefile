@@ -11,8 +11,8 @@ TENSORFLOW_GIT_REPO ?= https://github.com/tensorflow/tensorflow.git
 TENSORFLOW_GIT_REV ?= 54dee6dd8d47b6e597f4d3f85b6fb43fd5f50f82
 
 # Private configuration
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-TARGET_DIR ?= $(ROOT_DIR)/priv
+SRC_DIR = extension
+TARGET_DIR = priv
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
 TENSORFLOW_NS = tf-$(TENSORFLOW_GIT_REV)
@@ -29,7 +29,7 @@ $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_EXLA_NS)/xla_extension: symlinks
 
 symlinks: $(TENSORFLOW_DIR)
 	@ rm -f $(TENSORFLOW_XLA_EXTENSION_DIR)
-	@ ln -s "$(ROOT_DIR)/extension" $(TENSORFLOW_XLA_EXTENSION_DIR)
+	@ ln -s "$(SRC_DIR)/extension" $(TENSORFLOW_XLA_EXTENSION_DIR)
 
 # Print Tensorflow Dir
 PTD:
@@ -49,4 +49,4 @@ clean:
 	cd $(TENSORFLOW_DIR) && bazel clean --expunge
 	rm -f $(TENSORFLOW_XLA_EXTENSION_DIR)
 	rm -rf $(TENSORFLOW_DIR)
-	rm -rf $(ROOT_DIR)/xla_extension.tar.gz
+	rm -rf $(TARGET_DIR)/xla_extension.tar.gz

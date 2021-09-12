@@ -1,6 +1,7 @@
 defmodule XLA.MixProject do
   use Mix.Project
 
+  # TODO: adjust
   @version "0.1.1-dev"
   @github_repo "jonatanklosko/xla"
 
@@ -8,6 +9,7 @@ defmodule XLA.MixProject do
     [
       app: :xla,
       version: @version,
+      description: "Precompiled Google's XLA binaries",
       elixir: "~> 1.12",
       deps: deps(),
       compilers: [:xla | Mix.compilers()],
@@ -61,26 +63,40 @@ defmodule XLA.MixProject do
   # Custom compiler, either fetches or builds the XLA extension
 
   defp compile(_) do
-    if Mix.env() == :prod and not File.exists?(archive_path()) do
-      if force_build?() do
-        build()
-      else
-        download_precompiled()
+    unless skip_compilation?() do
+      cond do
+        force_build?() ->
+          build_form_source()
+
+        url = xla_archive_url() ->
+          download_custom(url)
+
+        true ->
+          download_matching()
       end
     end
 
+    # Symlink the priv directory
+    Mix.Project.build_structure()
+
     {:ok, []}
+  end
+
+  defp skip_compilation?() do
+    Mix.env() != :prod or File.exists?(archive_path())
   end
 
   defp force_build?() do
     System.get_env("XLA_BUILD") == "true"
   end
 
+  defp xla_archive_url() do
+    System.get_env("XLA_ARCHIVE_URL")
+  end
+
   defp xla_target() do
     target = System.get_env("XLA_TARGET", "cpu")
 
-    # TODO: if cuda is given we may try determining the version
-    # and printing info that cudaxyz is assumed
     supported_xla_targets = ["cpu", "cuda", "rocm", "tpu", "cuda102", "cuda110", "cuda111"]
 
     unless target in supported_xla_targets do
@@ -92,7 +108,7 @@ defmodule XLA.MixProject do
     target
   end
 
-  defp build() do
+  defp build_form_source() do
     Mix.Task.run("compile.elixir_make")
   end
 
@@ -109,7 +125,18 @@ defmodule XLA.MixProject do
     %{"XLA_EXTENSION_INTERNAL_FLAGS" => bazel_build_flags}
   end
 
-  defp download_precompiled() do
+  defp download_custom(url) do
+    archive_path = archive_path()
+    File.mkdir_p!(Path.dirname(archive_path))
+
+    if download(url, archive_path) == :error do
+      exit_with_reason!("failed to download the XLA archive from #{url}")
+    end
+
+    Mix.shell().info("Successfully downloaded the XLA archive")
+  end
+
+  defp download_matching() do
     archive_path = archive_path()
     expected_filename = archive_filename_with_target()
 
@@ -119,9 +146,7 @@ defmodule XLA.MixProject do
       )
     end
 
-    Mix.shell().info(
-      "No precompiled XLA archive found locally, trying to find a precompiled one online"
-    )
+    Mix.shell().info("No precompiled XLA archive found locally, trying to find one online")
 
     filenames =
       case list_release_files() do
