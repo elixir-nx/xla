@@ -25,5 +25,5 @@ xla-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
-# Build
+# Ignore the compiled archive
 /priv/

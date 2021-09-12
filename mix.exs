@@ -12,7 +12,8 @@ defmodule XLA.MixProject do
       deps: deps(),
       compilers: [:xla | Mix.compilers()],
       aliases: aliases(),
-      make_env: &make_env/0
+      make_env: &make_env/0,
+      package: package()
     ]
   end
 
@@ -22,6 +23,16 @@ defmodule XLA.MixProject do
 
   defp deps do
     [{:elixir_make, "~> 0.4", runtime: false}]
+  end
+
+  def package do
+    [
+      licenses: ["Apache-2.0"],
+      links: %{
+        "GitHub" => "https://github.com/elixir-nx/xla"
+      },
+      files: ~w(extension Makefile mix.exs README.md LICENSE CHANGELOG.md)
+    ]
   end
 
   defp aliases do
@@ -49,15 +60,6 @@ defmodule XLA.MixProject do
 
   # Custom compiler, either fetches or builds the XLA extension
 
-  defmodule InitError do
-    defexception [:message]
-
-    @impl true
-    def blame(error, _stacktrace) do
-      {error, []}
-    end
-  end
-
   defp compile(_) do
     if Mix.env() == :prod and not File.exists?(archive_path()) do
       if force_build?() do
@@ -67,7 +69,7 @@ defmodule XLA.MixProject do
       end
     end
 
-    :ok
+    {:ok, []}
   end
 
   defp force_build?() do
@@ -84,15 +86,13 @@ defmodule XLA.MixProject do
     unless target in supported_xla_targets do
       listing = supported_xla_targets |> Enum.map(&inspect/1) |> Enum.join(", ")
 
-      raise InitError,
-            "expected XLA_TARGET to be one of #{listing}, but got: #{inspect(target)}"
+      Mix.raise("expected XLA_TARGET to be one of #{listing}, but got: #{inspect(target)}")
     end
 
     target
   end
 
   defp build() do
-    # TODO: set XLA flags when cuda/tpu/rocm
     Mix.Task.run("compile.elixir_make")
   end
 
@@ -115,7 +115,7 @@ defmodule XLA.MixProject do
 
     unless network_tool() do
       exit_with_reason!(
-        "Expected either curl or wget to be available in your system, but neither was found"
+        "expected either curl or wget to be available in your system, but neither was found"
       )
     end
 
@@ -130,14 +130,15 @@ defmodule XLA.MixProject do
 
         :error ->
           exit_with_reason!(
-            "Couldn't find #{release_tag()} release under https://github.com/#{@github_repo}/releases"
+            "could not find #{release_tag()} release under https://github.com/#{@github_repo}/releases"
           )
       end
 
     unless expected_filename in filenames do
       exit_with_reason!(
-        "None of the precompiled archives matches your target\n" <>
-          "  Expected: #{expected_filename}\n" <>
+        "none of the precompiled archives matches your target\n" <>
+          "  Expected:\n" <>
+          "    * #{expected_filename}\n" <>
           "  Found:\n" <>
           (filenames |> Enum.map(&("    * " <> &1)) |> Enum.join("\n"))
       )
@@ -146,20 +147,17 @@ defmodule XLA.MixProject do
     Mix.shell().info("Found a matching archive (#{expected_filename}), going to download it")
 
     if download_release_file(expected_filename, archive_path) == :error do
-      exit_with_reason!("Failed to download the XLA archive")
+      exit_with_reason!("failed to download the XLA archive")
     end
 
     Mix.shell().info("Successfully downloaded the XLA archive")
   end
 
   defp exit_with_reason!(message) do
-    Mix.shell().error(message)
-
-    Mix.shell().error(
-      "\nYou can also proceed to regular compilation by setting an environment variable: XLA_BUILD=true"
+    Mix.raise(
+      message <>
+        "\nYou can compile XLA locally by setting an environment variable: XLA_BUILD=true"
     )
-
-    raise InitError, "xla compilation aborted, see the output for more details"
   end
 
   defp release_tag() do
