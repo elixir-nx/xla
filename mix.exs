@@ -2,7 +2,7 @@ defmodule XLA.MixProject do
   use Mix.Project
 
   # TODO: adjust
-  @version "0.1.1-dev"
+  @version "0.1.2-dev"
   @github_repo "jonatanklosko/xla"
 
   def project do
