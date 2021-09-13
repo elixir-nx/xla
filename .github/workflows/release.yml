@@ -6,15 +6,6 @@ jobs:
   # linux x86_64 cpu/tpu
   linux:
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        xla_target: [cpu, tpu]
-    env:
-      MIX_ENV: prod
-      XLA_BUILD: true
-      XLA_TARGET: ${{ matrix.xla_target }}
-      CC: gcc-9
     steps:
       - uses: actions/checkout@v2
       - uses: erlef/setup-beam@v1
@@ -29,27 +20,26 @@ jobs:
         with:
           python-version: "3.9"
       - run: python -m pip install --upgrade pip numpy
-      # Build and upload the binary
+      # Build and upload the archives
       - run: mix deps.get
-      - run: .github/scripts/check_release.sh
+      - run: mix compile
+      - run: .github/scripts/compile_unless_exists.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        id: check_release
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: mix compile
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: .github/scripts/upload_binary.sh
+          XLA_TARGET: cpu
+          CC: gcc-9
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: tpu
+          CC: gcc-9
+      - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # darwin x86_64 cpu
-  macos_cpu:
+  macos:
     runs-on: macos-10.15
-    env:
-      MIX_ENV: prod
-      XLA_BUILD: true
-      XLA_TARGET: cpu
-      CC: gcc-9
     steps:
       - uses: actions/checkout@v2
       - run: brew install elixir
@@ -62,16 +52,15 @@ jobs:
         with:
           python-version: "3.9"
       - run: python -m pip install --upgrade pip numpy
-      # Build and upload the binary
+      # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/check_release.sh
+      - run: mix compile
+      - run: .github/scripts/compile_unless_exists.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        id: check_release
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: mix compile
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: .github/scripts/upload_binary.sh
+          XLA_TARGET: cpu
+          CC: gcc-9
+      - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -96,9 +85,6 @@ jobs:
             image_os: ubuntu18
     container: ${{ matrix.container }}
     env:
-      MIX_ENV: prod
-      XLA_BUILD: true
-      XLA_TARGET: ${{ matrix.xla_target }}
       # This env is normally set by default, but we need to mirror it into the container
       # ourselves (used by the actions/setup-beam).
       ImageOS: ${{ matrix.image_os }}
@@ -144,15 +130,13 @@ jobs:
           # is used for pip cache and is not relevant either way
           HOME: /root
       - run: python -m pip install --upgrade pip numpy
-      # Build and upload the binary
+      # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/check_release.sh
+      - run: mix compile
+      - run: .github/scripts/compile_unless_exists.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        id: check_release
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: mix compile
-      - if: ${{ steps.check_release.outputs.continue == 'true' }}
-        run: .github/scripts/upload_binary.sh
+          XLA_TARGET: ${{ matrix.xla_target }}
+      - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

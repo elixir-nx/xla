@@ -8,6 +8,10 @@ EXLA already depends on this package, so you generally don't need to install it 
 There is however a number of environment variables that you may want to use in order to
 customize the variant of XLA binary.
 
+The binaries are always built/downloaded to match the current configuration, so you should
+set the environment variables in `.bash_profile` or a similar configuration file so you don't
+need to export it in every shell session.
+
 #### `XLA_TARGET`
 
 The default value is `cpu`, which implies the final the binary supports targeting
@@ -30,9 +34,6 @@ and [the cuDNN support matrix](https://docs.nvidia.com/deeplearning/cudnn/suppor
 for version compatibility. To use precompiled XLA binaries specify a target matching
 your CUDA version (like `cuda111`). When building from source it's enough to specify
 `cuda` as the target.
-
-You may want to set this in `.bash_profile` or a similar configuration file so you don't
-need to export it every time you need to build XLA.
 
 #### `XLA_BUILD`
 
@@ -121,9 +122,9 @@ You can use the following env vars to customize your build:
 
   * `BUILD_MODE` - controls to compile `opt` (default) artifacts or `dbg`, example: `BUILD_MODE=dbg`
 
-  * `XLA_EXTENSION_FLAGS` - additional flags passed to Bazel
-
   * `BUILD_CACHE` - controls where to store Tensorflow source and builds
+
+  * `BUILD_FLAGS` - additional flags passed to Bazel
 
   * `XLA_FLAGS` - controls XLA-specific options, see: [tensorflow/compiler/xla/debug_options_flags.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/compiler/xla/debug_options_flags.cc)
     for list of available flags

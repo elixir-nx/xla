@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")/../.."
 
-tag=$(mix build.release_tag)
+tag=$(mix xla.release_tag)
 
 if gh release list | grep -q $tag; then
   echo "Release $tag already exists, make sure to bump the version in mix.exs"
