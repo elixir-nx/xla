@@ -120,14 +120,17 @@ All you need is setting `XLA_TARGET=tpu`.
 
 You can use the following env vars to customize your build:
 
-  * `BUILD_MODE` - controls to compile `opt` (default) artifacts or `dbg`, example: `BUILD_MODE=dbg`
-
   * `BUILD_CACHE` - controls where to store Tensorflow source and builds
 
   * `BUILD_FLAGS` - additional flags passed to Bazel
 
-  * `XLA_FLAGS` - controls XLA-specific options, see: [tensorflow/compiler/xla/debug_options_flags.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/compiler/xla/debug_options_flags.cc)
-    for list of available flags
+  * `BUILD_MODE` - controls to compile `opt` (default) artifacts or `dbg`, example: `BUILD_MODE=dbg`
+
+## Runtime flags
+
+You can further configure XLA runtime options with `XLA_FLAGS`,
+see: [tensorflow/compiler/xla/debug_options_flags.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/compiler/xla/debug_options_flags.cc)
+for the list of available flags.
 
 ## Release process
 
