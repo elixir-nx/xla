@@ -4,6 +4,9 @@ set -ex
 
 cd "$(dirname "$0")/../.."
 
+# Ensure tasks are compiled
+mix compile
+
 tag=$(mix xla.release_tag)
 
 cd cache/build

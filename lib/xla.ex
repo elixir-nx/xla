@@ -76,7 +76,8 @@ defmodule XLA do
     %{
       "BUILD_INTERNAL_FLAGS" => bazel_build_flags,
       "ROOT_DIR" => Path.expand("..", __DIR__),
-      "BUILD_ARCHIVE" => archive_path_for_build()
+      "BUILD_ARCHIVE" => archive_path_for_build(),
+      "BUILD_ARCHIVE_DIR" => Path.dirname(archive_path_for_build())
     }
   end
 

@@ -2,7 +2,7 @@ defmodule XLA.MixProject do
   use Mix.Project
 
   # TODO: adjust
-  @version "0.1.3-dev"
+  @version "0.1.4-dev"
 
   def project do
     [

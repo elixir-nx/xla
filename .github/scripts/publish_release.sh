@@ -4,6 +4,9 @@ set -e
 
 cd "$(dirname "$0")/../.."
 
+# Ensure tasks are compiled
+mix compile
+
 tag=$(mix xla.release_tag)
 
 if gh release list | grep -q $tag; then
