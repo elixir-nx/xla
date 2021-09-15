@@ -30,11 +30,11 @@ defmodule XLA.MixProject do
       links: %{
         "GitHub" => "https://github.com/elixir-nx/xla"
       },
-      files: ~w(extension Makefile mix.exs README.md LICENSE CHANGELOG.md)
+      files: ~w(extension lib Makefile Makefile.win mix.exs README.md LICENSE CHANGELOG.md)
     ]
   end
 
   defp build?() do
-    System.get_env("XLA_BUILD") == "true"
+    System.get_env("XLA_BUILD") in ~w(1 true)
   end
 end
