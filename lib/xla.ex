@@ -5,8 +5,7 @@ defmodule XLA do
 
   require Logger
 
-  # TODO adjust
-  @github_repo "jonatanklosko/xla"
+  @github_repo "elixir-nx/xla"
 
   # The directory where we store all the archives
   @cache_dir Path.expand("../cache", __DIR__)
