@@ -7,10 +7,10 @@ cd "$(dirname "$0")/../.."
 # Ensure tasks are compiled
 mix compile
 
-tag=$(mix xla.release_tag)
+tag=$(mix xla.info release_tag)
 
 if gh release list | grep $tag; then
-  archive_filename=$(mix xla.archive_filename)
+  archive_filename=$(mix xla.info archive_filename)
 
   if gh release view $tag | grep $archive_filename; then
     echo "Found $archive_filename in $tag release artifacts, skipping compilation"

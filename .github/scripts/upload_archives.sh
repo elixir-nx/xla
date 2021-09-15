@@ -7,7 +7,7 @@ cd "$(dirname "$0")/../.."
 # Ensure tasks are compiled
 mix compile
 
-tag=$(mix xla.release_tag)
+tag=$(mix xla.info release_tag)
 
 cd cache/build
 

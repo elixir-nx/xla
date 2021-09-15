@@ -42,7 +42,7 @@ defmodule XLA do
   end
 
   defp build?() do
-    System.get_env("XLA_BUILD") == "true"
+    System.get_env("XLA_BUILD") in ~w(1 true)
   end
 
   defp xla_archive_url() do
