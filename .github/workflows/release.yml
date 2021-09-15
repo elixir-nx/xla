@@ -1,0 +1,182 @@
+name: Release
+on:
+  release:
+    types: [published]
+jobs:
+  # linux x86_64 cpu/tpu
+  linux:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "24"
+          elixir-version: "1.12.3"
+      # Setup the compilation environment
+      - uses: abhinavsingh/setup-bazel@v3
+        with:
+          version: "3.7.2"
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - run: python -m pip install --upgrade pip numpy
+      # Build and upload the archives
+      - run: mix deps.get
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+          CC: gcc-9
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: tpu
+          CC: gcc-9
+      - run: .github/scripts/upload_archives.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # darwin x86_64 cpu
+  macos:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install elixir
+      - run: mix local.hex --force
+      # Setup the compilation environment
+      - uses: abhinavsingh/setup-bazel@v3
+        with:
+          version: "3.7.2"
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - run: python -m pip install --upgrade pip numpy
+      # Build and upload the archive
+      - run: mix deps.get
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+          CC: gcc-9
+      - run: .github/scripts/upload_archives.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # linux x86_64 cuda
+  linux_cuda:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+            xla_target: cuda111
+            python: "3.9"
+            image_os: ubuntu20
+          - container: nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04
+            xla_target: cuda110
+            python: "3.9"
+            image_os: ubuntu20
+          - container: nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+            xla_target: cuda102
+            python: "3.6.9"
+            image_os: ubuntu18
+    container: ${{ matrix.container }}
+    env:
+      # This env is normally set by default, but we need to mirror it into the container
+      # ourselves (used by the actions/setup-beam).
+      ImageOS: ${{ matrix.image_os }}
+      # Set the missing utf-8 locales, otherwise Elixir warns
+      LANG: en_US.UTF-8
+      LANGUAGE: en_US:en
+      LC_ALL: en_US.UTF-8
+      # Make sure installing packages (like tzdata) doesn't prompt for configuration
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      # The base images are minimalistic, so we bring a few necessary system packages
+      - name: Install system packages
+        run: |
+          # We need to install "add-apt-repository" first
+          apt-get update && apt-get install -y software-properties-common
+          # Add repository with the latest git version for action/checkout to properly clone the repo
+          add-apt-repository ppa:git-core/ppa
+          # We run as root, so sudo is not necessary per se, but some actions (like setup-bazel) make use of it
+          apt-get update && apt-get install -y locales ca-certificates curl git sudo unzip wget
+          # Install GitHub CLI used by our scripts
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt-get update && apt-get install -y gh
+          # Update locales
+          echo "$LANG UTF-8" >> /etc/locale.gen
+          locale-gen
+          update-locale LANG=$LANG
+      # Proceed with the regular steps
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "24"
+          elixir-version: "1.12.3"
+      # Setup the compilation environment
+      - uses: abhinavsingh/setup-bazel@v3
+        with:
+          version: "3.7.2"
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+        env:
+          # Avoid permission errors for /github/home, in this case the directory
+          # is used for pip cache and is not relevant either way
+          HOME: /root
+      - run: python -m pip install --upgrade pip numpy
+      # Build and upload the archive
+      - run: mix deps.get
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: ${{ matrix.xla_target }}
+      - run: .github/scripts/upload_archives.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # windows x86_64 cpu
+  windows:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "24"
+          elixir-version: "1.12.3"
+      # Setup the compilation environment
+      - uses: abhinavsingh/setup-bazel@v3
+        with:
+          version: "3.7.2"
+      # We rely on the default Python installation, since using setup-python results
+      # in errors when building with Bazel
+      - run: python -m pip install --upgrade pip numpy
+      # Update Visual Studio installer to avoid errors in the subsequent installation.
+      # See https://github.com/jberezanski/ChocolateyPackages/issues/97#issuecomment-798688284
+      - run: choco upgrade -y visualstudio2019enterprise
+      # Install Visual Studio Build Tools
+      - run: choco install -y visualstudio2019buildtools visualstudio2019-workload-vctools
+      # Set up the environment, specifically this makes nmake discoverable in PATH
+      - uses: ilammy/msvc-dev-cmd@v1
+      # Build and upload the archives
+      - run: mix deps.get
+      # Compute the parent dir and set it as an environment variable
+      - run: echo "PARENT_DIR=$(Resolve-Path "..")" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+          # The default HOME is on the C: drive and for some reason working
+          # there leads to issues, so we use a local location instead
+          HOME: ${{ env.PARENT_DIR }}
+          # This should be inferred automatically, but bazel fails unless we set this explicitly
+          # See https://docs.bazel.build/versions/main/windows.html#build-c-with-msvc
+          BAZEL_VC: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
+        shell: bash
+      - run: .github/scripts/upload_archives.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
