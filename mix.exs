@@ -12,7 +12,8 @@ defmodule XLA.MixProject do
       deps: deps(),
       compilers: Mix.compilers() ++ if(build?(), do: [:elixir_make], else: []),
       make_env: &XLA.make_env/0,
-      package: package()
+      package: package(),
+      docs: docs()
     ]
   end
 
@@ -21,7 +22,10 @@ defmodule XLA.MixProject do
   end
 
   defp deps do
-    [{:elixir_make, "~> 0.4", runtime: false}]
+    [
+      {:elixir_make, "~> 0.4", runtime: false},
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
+    ]
   end
 
   def package do
@@ -31,6 +35,15 @@ defmodule XLA.MixProject do
         "GitHub" => "https://github.com/elixir-nx/xla"
       },
       files: ~w(extension lib Makefile Makefile.win mix.exs README.md LICENSE CHANGELOG.md)
+    ]
+  end
+
+  def docs do
+    [
+      main: "readme",
+      source_url: "https://github.com/elixir-nx/xla",
+      source_ref: "v#{@version}",
+      extras: ["README.md"]
     ]
   end
 
