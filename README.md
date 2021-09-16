@@ -140,3 +140,20 @@ To publish a new version of this package:
 2. Run `.github/scripts/publish_release.sh`.
 3. Wait for the release workflow to build all the binaries.
 4. Publish the package to Hex.
+
+## License
+
+Note that the build artifacts are a result of compiling Google XLA,
+hence are under their own license. See [Tensorflow](https://github.com/tensorflow/tensorflow).
+
+    Copyright (c) 2020 Sean Moriarity
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
