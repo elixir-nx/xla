@@ -7,12 +7,6 @@ defmodule XLA do
 
   @github_repo "elixir-nx/xla"
 
-  # The directory where we store all the archives
-  @cache_dir Path.expand("../cache", __DIR__)
-  @build_dir Path.join(@cache_dir, "build")
-  @download_dir Path.join(@cache_dir, "download")
-  @external_dir Path.join(@cache_dir, "external")
-
   @doc """
   Returns path to the precompiled XLA archive.
 
@@ -82,13 +76,17 @@ defmodule XLA do
 
   @doc false
   def release_tag() do
-    version = Application.spec(:xla, :vsn)
-    "v" <> to_string(version)
+    "v" <> version()
   end
 
   @doc false
   def archive_filename_with_target() do
     "xla_extension-#{target()}.tar.gz"
+  end
+
+  defp version() do
+    version = Application.spec(:xla, :vsn)
+    to_string(version)
   end
 
   defp target() do
@@ -108,18 +106,24 @@ defmodule XLA do
 
   defp archive_path_for_build() do
     filename = archive_filename_with_target()
-    Path.join(@build_dir, filename)
+    cache_path(["build", filename])
   end
 
   defp archive_path_for_external_download(url) do
     hash = url |> :erlang.md5() |> Base.encode32(case: :lower, padding: false)
     filename = "xla_extension-#{hash}.tar.gz"
-    Path.join(@external_dir, filename)
+    cache_path(["external", filename])
   end
 
   defp archive_path_for_matching_download() do
     filename = archive_filename_with_target()
-    Path.join(@download_dir, filename)
+    cache_path(["download", filename])
+  end
+
+  defp cache_path(parts) do
+    # The directory where we store all the archives
+    base_dir = :filename.basedir(:user_cache, "xla")
+    Path.join([base_dir, version(), "cache" | parts])
   end
 
   defp download_external!(url, archive_path) do
