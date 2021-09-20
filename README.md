@@ -38,8 +38,9 @@ your CUDA version (like `cuda111`). When building from source it's enough to spe
 #### `XLA_BUILD`
 
 Defaults to `false`. If `true` the binary is built locally, which may be intended
-if no precompiled binary is available for your target environment. Building has
-a number of dependencies, see *Building from source* below.
+if no precompiled binary is available for your target environment. If using XLA as
+a dependency, you may need to run `mix deps.compile xla` explicitly after setting
+this variable. Building has a number of dependencies, see *Building from source* below.
 
 #### `XLA_ARCHIVE_URL`
 
