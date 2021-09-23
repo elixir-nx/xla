@@ -57,13 +57,21 @@ defmodule XLA do
 
   @doc false
   def make_env() do
-    bazel_build_flags =
+    bazel_build_flags_accelerator =
       case xla_target() do
-        "cuda" <> _ -> "--config=cuda"
-        "rocm" <> _ -> "--config=rocm --action_env=HIP_PLATFORM=hcc"
-        "tpu" <> _ -> "--config=tpu"
-        _ -> ""
+        "cuda" <> _ -> ["--config=cuda"]
+        "rocm" <> _ -> ["--config=rocm", "--action_env=HIP_PLATFORM=hcc"]
+        "tpu" <> _ -> ["--config=tpu"]
+        _ -> []
       end
+
+    bazel_build_flags_cpu =
+      case cpu_and_os() do
+        {"aarch64", "darwin"} -> ["--config=macos_arm64"]
+        _ -> []
+      end
+
+    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_cpu, " ")
 
     # Additional environment variables passed to make
     %{
@@ -90,18 +98,20 @@ defmodule XLA do
   end
 
   defp target() do
-    {cpu, os} =
-      :erlang.system_info(:system_architecture)
-      |> List.to_string()
-      |> String.split("-")
-      |> case do
-        ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin"}
-        [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin"}
-        [cpu, _vendor, os | _] -> {cpu, os}
-        ["win32"] -> {"x86_64", "windows"}
-      end
-
+    {cpu, os} = cpu_and_os()
     "#{cpu}-#{os}-#{xla_target()}"
+  end
+
+  defp cpu_and_os() do
+    :erlang.system_info(:system_architecture)
+    |> List.to_string()
+    |> String.split("-")
+    |> case do
+      ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin"}
+      [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin"}
+      [cpu, _vendor, os | _] -> {cpu, os}
+      ["win32"] -> {"x86_64", "windows"}
+    end
   end
 
   defp archive_path_for_build() do
