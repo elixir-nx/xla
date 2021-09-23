@@ -120,8 +120,7 @@ All you need is setting `XLA_TARGET=tpu`.
 ### Apple Silicon
 
 Building on Apple Silicon requires a newer version of Bazel, it's been verified
-to work with `4.2.1`. You need to explicitly override the version by setting
-`USE_BAZEL_VERSION=4.2.1`.
+to work with `4.2.1`.
 
 ### Compilation-specific environment variables
 
