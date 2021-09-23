@@ -98,12 +98,12 @@ genrule(
         d="$${d#*external/$${extname}/}"
       fi
       # Remap llvm paths
-      d="$${d/llvm\/include\/llvm/llvm}"
-      d="$${d/llvm\/include\/llvm-c/llvm-c}"
+      d="$${d/llvm\\/include\\/llvm/llvm}"
+      d="$${d/llvm\\/include\\/llvm-c/llvm-c}"
       # Remap google path
-      d="$${d/src\/google/google}"
+      d="$${d/src\\/google/google}"
       # Remap grpc paths
-      d="$${d/include\/grpc/grpc}"
+      d="$${d/include\\/grpc/grpc}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done
