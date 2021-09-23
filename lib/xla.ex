@@ -5,6 +5,7 @@ defmodule XLA do
 
   require Logger
 
+  @version Mix.Project.config()[:version]
   @github_repo "elixir-nx/xla"
 
   @doc """
@@ -84,17 +85,12 @@ defmodule XLA do
 
   @doc false
   def release_tag() do
-    "v" <> version()
+    "v" <> @version
   end
 
   @doc false
   def archive_filename_with_target() do
     "xla_extension-#{target()}.tar.gz"
-  end
-
-  defp version() do
-    version = Application.spec(:xla, :vsn)
-    to_string(version)
   end
 
   defp target() do
@@ -133,7 +129,7 @@ defmodule XLA do
   defp cache_path(parts) do
     # The directory where we store all the archives
     base_dir = :filename.basedir(:user_cache, "xla")
-    Path.join([base_dir, version(), "cache" | parts])
+    Path.join([base_dir, @version, "cache" | parts])
   end
 
   defp download_external!(url, archive_path) do
