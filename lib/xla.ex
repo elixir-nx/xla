@@ -5,6 +5,7 @@ defmodule XLA do
 
   require Logger
 
+  @version Mix.Project.config()[:version]
   @github_repo "elixir-nx/xla"
 
   @doc """
@@ -57,13 +58,21 @@ defmodule XLA do
 
   @doc false
   def make_env() do
-    bazel_build_flags =
+    bazel_build_flags_accelerator =
       case xla_target() do
-        "cuda" <> _ -> "--config=cuda"
-        "rocm" <> _ -> "--config=rocm --action_env=HIP_PLATFORM=hcc"
-        "tpu" <> _ -> "--config=tpu"
-        _ -> ""
+        "cuda" <> _ -> ["--config=cuda"]
+        "rocm" <> _ -> ["--config=rocm", "--action_env=HIP_PLATFORM=hcc"]
+        "tpu" <> _ -> ["--config=tpu"]
+        _ -> []
       end
+
+    bazel_build_flags_cpu =
+      case cpu_and_os() do
+        {"aarch64", "darwin"} -> ["--config=macos_arm64"]
+        _ -> []
+      end
+
+    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_cpu, " ")
 
     # Additional environment variables passed to make
     %{
@@ -76,7 +85,7 @@ defmodule XLA do
 
   @doc false
   def release_tag() do
-    "v" <> version()
+    "v" <> @version
   end
 
   @doc false
@@ -84,24 +93,21 @@ defmodule XLA do
     "xla_extension-#{target()}.tar.gz"
   end
 
-  defp version() do
-    version = Application.spec(:xla, :vsn)
-    to_string(version)
+  defp target() do
+    {cpu, os} = cpu_and_os()
+    "#{cpu}-#{os}-#{xla_target()}"
   end
 
-  defp target() do
-    {cpu, os} =
-      :erlang.system_info(:system_architecture)
-      |> List.to_string()
-      |> String.split("-")
-      |> case do
-        ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin"}
-        [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin"}
-        [cpu, _vendor, os | _] -> {cpu, os}
-        ["win32"] -> {"x86_64", "windows"}
-      end
-
-    "#{cpu}-#{os}-#{xla_target()}"
+  defp cpu_and_os() do
+    :erlang.system_info(:system_architecture)
+    |> List.to_string()
+    |> String.split("-")
+    |> case do
+      ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin"}
+      [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin"}
+      [cpu, _vendor, os | _] -> {cpu, os}
+      ["win32"] -> {"x86_64", "windows"}
+    end
   end
 
   defp archive_path_for_build() do
@@ -123,7 +129,7 @@ defmodule XLA do
   defp cache_path(parts) do
     # The directory where we store all the archives
     base_dir = :filename.basedir(:user_cache, "xla")
-    Path.join([base_dir, version(), "cache" | parts])
+    Path.join([base_dir, @version, "cache" | parts])
   end
 
   defp download_external!(url, archive_path) do
