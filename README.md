@@ -47,6 +47,11 @@ this variable. Building has a number of dependencies, see *Building from source*
 A URL pointing to a specific build of the `.tar.gz` archive. When using this option
 you need to make sure the build matches your OS, CPU architecture and the XLA target.
 
+#### `XLA_CACHE_DIR`
+
+The directory to store the downloaded and built archives in. Defaults to the standard
+cache location for the given operating system.
+
 ## Building from source
 
 To build the XLA binaries locally you need to set `XLA_BUILD=true` and possibly `XLA_TARGET`.

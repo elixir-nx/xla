@@ -56,6 +56,15 @@ defmodule XLA do
     target
   end
 
+  defp xla_cache_dir() do
+    # The directory where we store all the archives
+    if dir = System.get_env("XLA_CACHE_DIR") do
+      Path.expand(dir)
+    else
+      :filename.basedir(:user_cache, "xla")
+    end
+  end
+
   @doc false
   def make_env() do
     bazel_build_flags_accelerator =
@@ -79,8 +88,13 @@ defmodule XLA do
       "BUILD_INTERNAL_FLAGS" => bazel_build_flags,
       "ROOT_DIR" => Path.expand("..", __DIR__),
       "BUILD_ARCHIVE" => archive_path_for_build(),
-      "BUILD_ARCHIVE_DIR" => Path.dirname(archive_path_for_build())
+      "BUILD_ARCHIVE_DIR" => build_archive_dir()
     }
+  end
+
+  @doc false
+  def build_archive_dir() do
+    Path.dirname(archive_path_for_build())
   end
 
   @doc false
@@ -127,8 +141,7 @@ defmodule XLA do
   end
 
   defp cache_path(parts) do
-    # The directory where we store all the archives
-    base_dir = :filename.basedir(:user_cache, "xla")
+    base_dir = xla_cache_dir()
     Path.join([base_dir, @version, "cache" | parts])
   end
 

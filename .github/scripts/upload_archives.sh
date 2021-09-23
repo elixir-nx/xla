@@ -8,8 +8,20 @@ cd "$(dirname "$0")/../.."
 mix compile
 
 tag=$(mix xla.info release_tag)
+build_archive_dir=$(mix xla.info build_archive_dir)
+upload_dir=tmp/upload
 
-cd cache/build
+if [[ -d $build_archive_dir ]]; then
+  # Copy the archives into directory within this repo,
+  # so that gh cli works within its context
+  mkdir -p $upload_dir
+  rm -f $upload_dir/*
+  cp $build_archive_dir/* $upload_dir
+  cd $upload_dir
+else
+  echo "Build directory not found"
+  exit 1
+fi
 
 for file in *.tar.gz; do
   # Uploading is the final action after several hour long build,

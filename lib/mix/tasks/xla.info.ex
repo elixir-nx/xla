@@ -14,11 +14,16 @@ defmodule Mix.Tasks.Xla.Info do
     Mix.shell().info(XLA.release_tag())
   end
 
+  def run(["build_archive_dir"]) do
+    Mix.shell().info(XLA.build_archive_dir())
+  end
+
   def run(_args) do
     Mix.shell().error("""
     Usage:
     mix xla.info archive_filename
     mix xla.info release_tag\
+    mix xla.info build_archive_dir\
     """)
   end
 end
