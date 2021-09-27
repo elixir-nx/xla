@@ -38,7 +38,8 @@ $(TENSORFLOW_DIR):
 		git init && \
 		git remote add origin $(TENSORFLOW_GIT_REPO) && \
 		git fetch --depth 1 origin $(TENSORFLOW_GIT_REV) && \
-		git checkout FETCH_HEAD
+		git checkout FETCH_HEAD && \
+		rm $(TENSORFLOW_DIR)/.bazelversion
 
 # Print Tensorflow Dir
 PTD:
