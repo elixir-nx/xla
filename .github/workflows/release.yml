@@ -17,7 +17,7 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "3.7.2"
+          version: "4.2.1"
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9"
@@ -48,7 +48,7 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "3.7.2"
+          version: "4.2.1"
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9"
@@ -74,7 +74,6 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          # For this specific build we want a more recent Bazel
           version: "4.2.1"
       - uses: actions/setup-python@v2
         with:
@@ -156,7 +155,7 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "3.7.2"
+          version: "4.2.1"
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
@@ -189,7 +188,7 @@ jobs:
   #     # Setup the compilation environment
   #     - uses: abhinavsingh/setup-bazel@v3
   #       with:
-  #         version: "3.7.2"
+  #         version: "4.2.1"
   #     # We rely on the default Python installation, since using setup-python results
   #     # in errors when building with Bazel
   #     - run: python -m pip install --upgrade pip numpy
