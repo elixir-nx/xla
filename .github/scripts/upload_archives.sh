@@ -20,7 +20,7 @@ if [[ -d $build_archive_dir ]]; then
   cd $upload_dir
 else
   echo "Build directory not found"
-  exit 1
+  exit 0
 fi
 
 for file in *.tar.gz; do

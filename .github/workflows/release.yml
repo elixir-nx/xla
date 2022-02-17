@@ -94,10 +94,12 @@ jobs:
           # Ensure tasks are compiled
           mix compile
           build_archive_dir=$(mix xla.info build_archive_dir)
-          archive_path=$(find $build_archive_dir -type f)
-          actual_archive_path="${archive_path/x86_64/aarch64}"
-          echo "$archive_path -> $actual_archive_path"
-          mv $archive_path $actual_archive_path
+          if [[ -d $build_archive_dir ]]; then
+            archive_path=$(find $build_archive_dir -type f)
+            actual_archive_path="${archive_path/x86_64/aarch64}"
+            echo "$archive_path -> $actual_archive_path"
+            mv $archive_path $actual_archive_path
+          fi;
       - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
