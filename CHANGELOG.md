@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 * Bumped XLA (Tensorflow) version to 2.8.0 ([#15](https://github.com/elixir-nx/xla/pull/15))
 
+### Removed
+
+* Dropped support for CUDA 10.2 and 11.0, now 11.1+ is required ([#17](https://github.com/elixir-nx/xla/pull/17))
+
 ## [v0.2.0](https://github.com/elixir-nx/xla/tree/v0.2.0) (2021-09-23)
 
 ### Added
