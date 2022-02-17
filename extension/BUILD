@@ -1,6 +1,6 @@
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_cuda_or_rocm",)
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_with_tpu_support",)
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_grpc_cc_dependency",)
+load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_grpc_cc_dependencies",)
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "transitive_hdrs",)
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar",)
 
@@ -50,11 +50,13 @@ cc_binary(
     "@org_tensorflow//tensorflow/compiler/xla/pjrt:tpu_client",
     "@org_tensorflow//tensorflow/core:lib",
     "@org_tensorflow//tensorflow/core:lib_internal_impl",
-    # GRPC Dependency (needed for PjRt distributed)
-    tf_grpc_cc_dependency(),
-  ] + if_with_tpu_support([
+  ]
+  # GRPC Dependencies (needed for PjRt distributed)
+  + tf_grpc_cc_dependencies()
+  + if_with_tpu_support([
     "@org_tensorflow//tensorflow/core/tpu:tpu_executor_dlsym_initializer",
-  ]) + if_cuda_or_rocm([
+  ])
+  + if_cuda_or_rocm([
     "@org_tensorflow//tensorflow/compiler/xla/service:gpu_plugin",
   ]),
   linkopts = ["-shared"],
@@ -100,6 +102,8 @@ genrule(
       # Remap llvm paths
       d="$${d/llvm\\/include\\/llvm/llvm}"
       d="$${d/llvm\\/include\\/llvm-c/llvm-c}"
+      # Remap mlir paths
+      d="$${d/mlir\\/include\\/mlir/mlir}"
       # Remap google path
       d="$${d/src\\/google/google}"
       # Remap grpc paths
