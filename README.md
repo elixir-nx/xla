@@ -60,7 +60,7 @@ Keep in mind that the compilation usually takes a very long time.
 You will need the following installed in your system for the compilation:
 
   * [Git](https://git-scm.com/) for fetching Tensorflow source
-  * [Bazel v3.7.2](https://bazel.build/) for compiling Tensorflow
+  * [Bazel v4.2.1](https://bazel.build/) for compiling Tensorflow
   * [Python3](https://python.org) with NumPy installed for compiling Tensorflow
 
 If running on Windows, you will also need:
@@ -73,14 +73,14 @@ If running on Windows, you will also need:
 
 #### Bazel version
 
-Use `bazel --version` to check your Bazel version, make sure you are using v3.7.2.
+Use `bazel --version` to check your Bazel version, make sure you are using v4.2.1.
 Most binaries are available on [Github](https://github.com/bazelbuild/bazel/releases),
 but it can also be installed with `asdf`:
 
 ```shell
 asdf plugin-add bazel
-asdf install bazel 3.7.2
-asdf global bazel 3.7.2
+asdf install bazel 4.2.1
+asdf global bazel 4.2.1
 ```
 
 #### GCC
@@ -121,11 +121,6 @@ for more details.
 ### TPU support
 
 All you need is setting `XLA_TARGET=tpu`.
-
-### Apple Silicon
-
-Building on Apple Silicon requires a newer version of Bazel, it's been verified
-to work with `4.2.1`.
 
 ### Compilation-specific environment variables
 
