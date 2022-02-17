@@ -22,8 +22,6 @@ only the host CPU.
 | cpu | |
 | tpu | libtpu |
 | cuda111 | CUDA 11.1+, cuDNN |
-| cuda110 | CUDA 11.0, cuDNN |
-| cuda102 | CUDA 10.2, cuDNN |
 | cuda | CUDA x.y, cuDNN |
 | rocm | ROCm |
 
