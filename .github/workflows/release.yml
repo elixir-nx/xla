@@ -106,19 +106,19 @@ jobs:
 
   # linux x86_64 cuda
   linux_cuda:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
             xla_target: cuda111
             python: "3.9"
     container: ${{ matrix.container }}
     env:
       # This env is normally set by default, but we need to mirror it into the container
       # ourselves (used by the actions/setup-beam).
-      ImageOS: ubuntu20
+      ImageOS: ubuntu18
       # Set the missing utf-8 locales, otherwise Elixir warns
       LANG: en_US.UTF-8
       LANGUAGE: en_US:en
