@@ -27,3 +27,6 @@ xla-*.tar
 
 # Ignore all the archives
 /cache/
+
+# Archives built using Docker
+/.github/builds/build/
