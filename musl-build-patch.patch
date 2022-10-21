@@ -1,17 +1,3 @@
-diff --git a/.bazelrc b/.bazelrc
-index 9cc8c846..8394169d 100644
---- a/.bazelrc
-+++ b/.bazelrc
-@@ -145,8 +145,7 @@ build --define=no_hdfs_support=true
- # TODO(rostam): Remove when `cc_shared_library` is enabled by default
- build --experimental_cc_shared_library
- 
--# cc_shared_library ensures no library is linked statically more than once.
--build --experimental_link_static_libraries_once=false
-+
- 
- # Default options should come above this line.
- 
 diff --git a/tensorflow/tensorflow.bzl b/tensorflow/tensorflow.bzl
 index 69d45283..d31c82c1 100644
 --- a/tensorflow/tensorflow.bzl
