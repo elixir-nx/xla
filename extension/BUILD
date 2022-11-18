@@ -14,40 +14,31 @@ cc_binary(
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
-    "@org_tensorflow//tensorflow/core/common_runtime:bfc_allocator",
-    "@org_tensorflow//tensorflow/compiler/xla:util",
-    "@org_tensorflow//tensorflow/compiler/xla:statusor",
-    "@org_tensorflow//tensorflow/compiler/xla:comparison_util",
-    "@org_tensorflow//tensorflow/compiler/xla:xla_data_proto_cc",
-    "@org_tensorflow//tensorflow/compiler/xla:literal",
-    "@org_tensorflow//tensorflow/compiler/xla:shape_util",
-    "@org_tensorflow//tensorflow/compiler/xla:status",
-    "@org_tensorflow//tensorflow/compiler/xla:types",
-    "@org_tensorflow//tensorflow/compiler/xla/service:platform_util",
-    "@org_tensorflow//tensorflow/compiler/xla/client:client",
-    "@org_tensorflow//tensorflow/compiler/xla/client:client_library",
-    "@org_tensorflow//tensorflow/compiler/xla/client:xla_builder",
-    "@org_tensorflow//tensorflow/compiler/xla/client:xla_computation",
-    "@org_tensorflow//tensorflow/compiler/xla/client:executable_build_options",
+    "@tf_runtime//:core_runtime",
+    "@tf_runtime//:hostcontext",
+    "@tf_runtime//third_party/llvm_derived:unique_any",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:lu_decomposition",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:math",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:qr",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:svd",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:self_adjoint_eig",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:protocol",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:protocol_proto_cc",
+    "@org_tensorflow//tensorflow/compiler/xla:literal",
+    "@org_tensorflow//tensorflow/compiler/xla:shape_util",
+    "@org_tensorflow//tensorflow/compiler/xla:status",
+    "@org_tensorflow//tensorflow/compiler/xla:statusor",
+    "@org_tensorflow//tensorflow/compiler/xla:types",
+    "@org_tensorflow//tensorflow/compiler/xla:util",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt:mlir_to_hlo",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt:interpreter_device",
     "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:gpu_device",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_stream_executor_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:local_device_state",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:event_pool",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:semaphore",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:worker_thread",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:tracked_device_buffer",
-    "@org_tensorflow//tensorflow/compiler/jit:xla_cpu_jit",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:cpu_device",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_compiler",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt:tfrt_cpu_pjrt_client",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_c_api_client",
     "@org_tensorflow//tensorflow/compiler/xla/pjrt:tpu_client",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt/gpu:se_gpu_pjrt_client",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:client",
+    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:service",
     "@org_tensorflow//tensorflow/core:lib",
     "@org_tensorflow//tensorflow/core:lib_internal_impl",
   ]
@@ -58,6 +49,7 @@ cc_binary(
   ])
   + if_cuda_or_rocm([
     "@org_tensorflow//tensorflow/compiler/xla/service:gpu_plugin",
+    "@org_tensorflow//tensorflow/compiler/xla/stream_executor:cuda_platform"
   ]),
   linkopts = ["-shared"],
   linkshared = 1,
@@ -99,6 +91,8 @@ genrule(
         d="$${d#*external/farmhash_archive/src}"
         d="$${d#*external/$${extname}/}"
       fi
+      # Remap third party paths
+      d="$${d/third_party\\/llvm_derived\\/include\\/llvm_derived/llvm_derived}"
       # Remap llvm paths
       d="$${d/llvm\\/include\\/llvm/llvm}"
       d="$${d/llvm\\/include\\/llvm-c/llvm-c}"
@@ -108,6 +102,8 @@ genrule(
       d="$${d/src\\/google/google}"
       # Remap grpc paths
       d="$${d/include\\/grpc/grpc}"
+      # Remap tfrt paths
+      d="$${d/include\\/tfrt/tfrt}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done

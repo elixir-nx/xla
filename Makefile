@@ -11,8 +11,8 @@ BUILD_MODE ?= opt # can also be dbg
 BUILD_CACHE ?= $(TEMP)/xla_extension
 TENSORFLOW_GIT_REPO ?= https://github.com/tensorflow/tensorflow.git
 
-# Tensorflow 2.8.0
-TENSORFLOW_GIT_REV ?= 359c3cdfc5fabac82b3c70b3b6de2b0a8c16874f
+# Tensorflow 2.11.0
+TENSORFLOW_GIT_REV ?= d5b57ca93e506df258271ea00fc29cf98383a374
 
 # Private configuration
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
@@ -34,13 +34,11 @@ $(BUILD_ARCHIVE): $(TENSORFLOW_DIR) extension/BUILD
 # Clones tensorflow
 $(TENSORFLOW_DIR):
 	mkdir -p $(TENSORFLOW_DIR) && \
-		mv musl-build-patch.patch $(TENSORFLOW_DIR) && \
 		cd $(TENSORFLOW_DIR) && \
 		git init && \
 		git remote add origin $(TENSORFLOW_GIT_REPO) && \
 		git fetch --depth 1 origin $(TENSORFLOW_GIT_REV) && \
 		git checkout FETCH_HEAD && \
-		git apply musl-build-patch.patch && \
 		rm $(TENSORFLOW_DIR)/.bazelversion
 
 # Print Tensorflow Dir
