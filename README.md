@@ -58,7 +58,7 @@ Keep in mind that the compilation usually takes a very long time.
 You will need the following installed in your system for the compilation:
 
   * [Git](https://git-scm.com/) for fetching Tensorflow source
-  * [Bazel v4.2.1](https://bazel.build/) for compiling Tensorflow
+  * [Bazel v5.3.0](https://bazel.build/) for compiling Tensorflow
   * [Python3](https://python.org) with NumPy installed for compiling Tensorflow
 
 If running on Windows, you will also need:
@@ -71,14 +71,14 @@ If running on Windows, you will also need:
 
 #### Bazel version
 
-Use `bazel --version` to check your Bazel version, make sure you are using v4.2.1.
+Use `bazel --version` to check your Bazel version, make sure you are using v5.3.0.
 Most binaries are available on [Github](https://github.com/bazelbuild/bazel/releases),
 but it can also be installed with `asdf`:
 
 ```shell
 asdf plugin-add bazel
-asdf install bazel 4.2.1
-asdf global bazel 4.2.1
+asdf install bazel 5.3.0
+asdf global bazel 5.3.0
 ```
 
 #### GCC
