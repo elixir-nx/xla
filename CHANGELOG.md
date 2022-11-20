@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.4.0](https://github.com/elixir-nx/xla/tree/v0.3.0) (2022-11-20)
+
+### Changed
+
+* Bumped XLA (Tensorflow) version to 2.11.0 ([#25](https://github.com/elixir-nx/xla/pull/25))
+
 ## [v0.3.0](https://github.com/elixir-nx/xla/tree/v0.3.0) (2022-02-17)
 
 ### Changed
