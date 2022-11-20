@@ -11,8 +11,8 @@ BUILD_MODE ?= opt # can also be dbg
 BUILD_CACHE ?= $(TEMP)/xla_extension
 TENSORFLOW_GIT_REPO ?= https://github.com/tensorflow/tensorflow.git
 
-# Tensorflow 2.8.0
-TENSORFLOW_GIT_REV ?= 3f878cff5b698b82eea85db2b60d65a2e320850e
+# Tensorflow 2.11.0
+TENSORFLOW_GIT_REV ?= d5b57ca93e506df258271ea00fc29cf98383a374
 
 # Private configuration
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
