@@ -45,7 +45,7 @@ cc_binary(
   # GRPC Dependencies (needed for PjRt distributed)
   + tf_grpc_cc_dependencies()
   + if_with_tpu_support([
-    "@org_tensorflow//tensorflow/core/tpu:tpu_executor_dlsym_initializer",
+    "@org_tensorflow//tensorflow/core/tpu:tpu_api_dlsym_initializer",
   ])
   + if_cuda_or_rocm([
     "@org_tensorflow//tensorflow/compiler/xla/service:gpu_plugin",
