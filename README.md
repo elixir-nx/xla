@@ -21,9 +21,9 @@ only the host CPU.
 | --- | --- |
 | cpu | |
 | tpu | libtpu |
-| cuda118 | CUDA 11.8+, cuDNN 8.6+, glibc 2.31+ (recommended) |
-| cuda114 | CUDA 11.4+, cuDNN 8.2+, glibc 2.31+ |
-| cuda111 | CUDA 11.1+, cuDNN 8.0.5+, glibc 2.31+ |
+| cuda118 | CUDA 11.8+, cuDNN 8.6+ (recommended) |
+| cuda114 | CUDA 11.4+, cuDNN 8.2+ |
+| cuda111 | CUDA 11.1+, cuDNN 8.0.5+ |
 | cuda | CUDA x.y, cuDNN |
 | rocm | ROCm |
 
@@ -34,6 +34,8 @@ and [the cuDNN support matrix](https://docs.nvidia.com/deeplearning/cudnn/suppor
 for version compatibility. To use precompiled XLA binaries specify a target matching
 your CUDA version (like `cuda118`). When building from source it's enough to specify
 `cuda` as the target.
+
+Note that all the precompiled binaries assume glibc 2.31 or newer.
 
 #### `XLA_BUILD`
 
