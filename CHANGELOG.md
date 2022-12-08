@@ -4,7 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [v0.4.0](https://github.com/elixir-nx/xla/tree/v0.3.0) (2022-11-20)
+## [v0.4.1](https://github.com/elixir-nx/xla/tree/v0.4.1) (2022-12-08)
+
+### Added
+
+* Precompiled binaries for CUDA 11.4+ (cuDNN 8.2+) and CUDA 11.8+ (cuDNN 8.6+) ([#27](https://github.com/elixir-nx/xla/pull/27))
+
+### Changed
+
+* Precompiled binaries to assume glibc 31+ ([#27](https://github.com/elixir-nx/xla/pull/27))
+
+## [v0.4.0](https://github.com/elixir-nx/xla/tree/v0.4.0) (2022-11-20)
 
 ### Changed
 
