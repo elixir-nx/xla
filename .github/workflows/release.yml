@@ -149,6 +149,8 @@ jobs:
           echo "$LANG UTF-8" >> /etc/locale.gen
           locale-gen
           update-locale LANG=$LANG
+      # Prevent git from checking the repository owner and erroring with "dubious ownership"
+      - run: git config --global --add safe.directory '*'
       # Proceed with the regular steps
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
