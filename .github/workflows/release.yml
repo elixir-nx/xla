@@ -6,11 +6,11 @@ on:
 jobs:
   # linux x86_64 cpu/tpu
   linux:
-    # We intentionally build on ubuntu 18 to compile against
+    # We intentionally build on ubuntu 20 to compile against
     # an older version of glibc
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "24"
@@ -43,7 +43,7 @@ jobs:
   macos:
     runs-on: macos-10.15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: brew install elixir
       - run: mix local.hex --force
       # Setup the compilation environment
@@ -69,7 +69,7 @@ jobs:
   macos_arm:
     runs-on: macos-10.15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: brew install elixir
       - run: mix local.hex --force
       # Setup the compilation environment
@@ -106,19 +106,25 @@ jobs:
 
   # linux x86_64 cuda
   linux_cuda:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
+          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
             xla_target: cuda111
+            python: "3.9"
+          - container: nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04
+            xla_target: cuda114
+            python: "3.9"
+          - container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+            xla_target: cuda118
             python: "3.9"
     container: ${{ matrix.container }}
     env:
       # This env is normally set by default, but we need to mirror it into the container
       # ourselves (used by the actions/setup-beam).
-      ImageOS: ubuntu18
+      ImageOS: ubuntu20
       # Set the missing utf-8 locales, otherwise Elixir warns
       LANG: en_US.UTF-8
       LANGUAGE: en_US:en
@@ -144,7 +150,7 @@ jobs:
           locale-gen
           update-locale LANG=$LANG
       # Proceed with the regular steps
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "24"
@@ -170,48 +176,3 @@ jobs:
       - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Note: the Windows build is disabled until Windows is supported on EXLA side
-
-  # # windows x86_64 cpu
-  # windows:
-  #   runs-on: windows-2019
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: erlef/setup-beam@v1
-  #       with:
-  #         otp-version: "24"
-  #         elixir-version: "1.12.3"
-  #     # Setup the compilation environment
-  #     - uses: abhinavsingh/setup-bazel@v3
-  #       with:
-  #         version: "5.3.0"
-  #     # We rely on the default Python installation, since using setup-python results
-  #     # in errors when building with Bazel
-  #     - run: python -m pip install --upgrade pip numpy
-  #     # Update Visual Studio installer to avoid errors in the subsequent installation.
-  #     # See https://github.com/jberezanski/ChocolateyPackages/issues/97#issuecomment-798688284
-  #     - run: choco upgrade -y visualstudio2019enterprise
-  #     # Install Visual Studio Build Tools
-  #     - run: choco install -y visualstudio2019buildtools visualstudio2019-workload-vctools
-  #     # Set up the environment, specifically this makes nmake discoverable in PATH
-  #     - uses: ilammy/msvc-dev-cmd@v1
-  #     # Build and upload the archives
-  #     - run: mix deps.get
-  #     # Compute the parent dir and set it as an environment variable
-  #     - run: echo "PARENT_DIR=$(Resolve-Path "..")" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     - run: .github/scripts/compile_unless_exists.sh
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         XLA_TARGET: cpu
-  #         # The default HOME is on the C: drive and for some reason working
-  #         # there leads to issues, so we use a local location instead
-  #         HOME: ${{ env.PARENT_DIR }}
-  #         # This should be inferred automatically, but bazel fails unless we set this explicitly
-  #         # See https://docs.bazel.build/versions/main/windows.html#build-c-with-msvc
-  #         BAZEL_VC: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
-  #       shell: bash
-  #     - run: .github/scripts/upload_archives.sh
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       shell: bash
