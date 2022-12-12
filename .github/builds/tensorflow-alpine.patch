@@ -1,0 +1,222 @@
+diff --git a/tensorflow/tensorflow.bzl b/tensorflow/tensorflow.bzl
+index 72bd0bcb94a..e3ed9a7e6d2 100644
+--- a/tensorflow/tensorflow.bzl
++++ b/tensorflow/tensorflow.bzl
+@@ -349,6 +349,15 @@ def lrt_if_needed():
+         "//conditions:default": [],
+     })
+ 
++def lexecinfo_if_needed():
++    lib = ["-lexecinfo"]
++    return select({
++        clean_dep("//tensorflow:linux_aarch64"): lib,
++        clean_dep("//tensorflow:linux_x86_64"): lib,
++        clean_dep("//tensorflow:linux_ppc64le"): lib,
++        "//conditions:default": lib,
++    })
++
+ def get_win_copts(is_external = False):
+     WINDOWS_COPTS = [
+         "/DPLATFORM_WINDOWS",
+@@ -683,7 +692,7 @@ def tf_cc_shared_object(
+         srcs = [],
+         deps = [],
+         data = [],
+-        linkopts = lrt_if_needed(),
++        linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         framework_so = tf_binary_additional_srcs(),
+         soversion = None,
+         kernels = [],
+@@ -788,7 +797,7 @@ def tf_cc_shared_library_opensource(
+         exports_filter = [],
+         data = [],
+         copts = [],
+-        linkopts = lrt_if_needed(),
++        linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         additional_linker_inputs = [],
+         linkstatic = True,
+         framework_so = [clean_dep("//tensorflow:libtensorflow_framework_import_lib")],
+@@ -956,7 +965,7 @@ def tf_cc_binary(
+         srcs = [],
+         deps = [],
+         data = [],
+-        linkopts = lrt_if_needed(),
++        linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         copts = tf_copts(),
+         kernels = [],
+         per_os_targets = False,  # Generate targets with SHARED_LIBRARY_NAME_PATTERNS
+@@ -1029,7 +1038,7 @@ def tf_native_cc_binary(
+                 "-lpthread",
+                 "-lm",
+             ],
+-        }) + linkopts + _rpath_linkopts(name) + lrt_if_needed(),
++        }) + linkopts + _rpath_linkopts(name) + lrt_if_needed() + lexecinfo_if_needed(),
+         **kwargs
+     )
+ 
+@@ -1050,7 +1059,7 @@ def tf_gen_op_wrapper_cc(
+     tf_cc_binary(
+         name = tool,
+         copts = tf_copts(),
+-        linkopts = if_not_windows(["-lm", "-Wl,-ldl"]) + lrt_if_needed(),
++        linkopts = if_not_windows(["-lm", "-Wl,-ldl"]) + lrt_if_needed() + lexecinfo_if_needed(),
+         linkstatic = 1,  # Faster to link this one-time-use binary dynamically
+         deps = [op_gen] + deps,
+     )
+@@ -1230,7 +1239,7 @@ def tf_gen_op_wrapper_py(
+         generated_target_name = None,
+         op_whitelist = [],
+         op_allowlist = [],
+-        cc_linkopts = lrt_if_needed(),
++        cc_linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         api_def_srcs = [],
+         compatible_with = [],
+         testonly = False):
+@@ -1354,7 +1363,7 @@ def tf_cc_test(
+         data = [],
+         extra_copts = [],
+         suffix = "",
+-        linkopts = lrt_if_needed(),
++        linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         kernels = [],
+         **kwargs):
+     cc_test(
+@@ -1526,7 +1535,7 @@ def tf_cc_tests(
+         tags = [],
+         size = "medium",
+         args = None,
+-        linkopts = lrt_if_needed(),
++        linkopts = lrt_if_needed() + lexecinfo_if_needed(),
+         kernels = [],
+         create_named_test_suite = False,
+         visibility = None):
+diff --git a/third_party/llvm/alpine_build_fix.patch b/third_party/llvm/alpine_build_fix.patch
+new file mode 100644
+index 00000000000..532674dd213
+--- /dev/null
++++ b/third_party/llvm/alpine_build_fix.patch
+@@ -0,0 +1,111 @@
++diff --git a/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel b/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
++index 3f9301b746cb..db72925f9502 100644
++--- a/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
+++++ b/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
++@@ -202,13 +202,15 @@ cc_library(
++         "lib/Support/BLAKE3/blake3_portable.c",
++     ] + select({
++         "@platforms//cpu:aarch64": [
++-            "lib/Support/BLAKE3/blake3_neon.c",
+++            # TODO(b/234415414): temporary disabled
+++            #            "lib/Support/BLAKE3/blake3_neon.c",
++         ],
++         "@platforms//cpu:x86_64": [
++-            "lib/Support/BLAKE3/blake3_sse2_x86-64_unix.S",
++-            "lib/Support/BLAKE3/blake3_sse41_x86-64_unix.S",
++-            "lib/Support/BLAKE3/blake3_avx2_x86-64_unix.S",
++-            "lib/Support/BLAKE3/blake3_avx512_x86-64_unix.S",
+++            # TODO(b/234415414): temporary disabled
+++            # "lib/Support/BLAKE3/blake3_sse2_x86-64_unix.S",
+++            # "lib/Support/BLAKE3/blake3_sse41_x86-64_unix.S",
+++            # "lib/Support/BLAKE3/blake3_avx2_x86-64_unix.S",
+++            # "lib/Support/BLAKE3/blake3_avx512_x86-64_unix.S",
++         ],
++         "//conditions:default": [
++         ],
++@@ -232,22 +234,18 @@ cc_library(
++         "include/llvm/Support/VCSRevision.h",
++     ],
++     copts = llvm_copts,
++-    defines = select({
++-        "@platforms//cpu:aarch64": [
++-        ],
++-        "//conditions:default": [
++-            "BLAKE3_USE_NEON=0",
++-        ],
++-    }) + select({
++-        "@platforms//cpu:x86_64": [
++-        ],
++-        "//conditions:default": [
++-            "BLAKE3_NO_AVX2",
++-            "BLAKE3_NO_AVX512",
++-            "BLAKE3_NO_SSE2",
++-            "BLAKE3_NO_SSE41",
++-        ],
++-    }),
+++    defines = llvm_config_defines + select({
+++         "//conditions:default": [
+++             "BLAKE3_USE_NEON=0",
+++         ],
+++     }) + select({
+++      "//conditions:default": [
+++        "BLAKE3_NO_AVX2",
+++        "BLAKE3_NO_AVX512",
+++        "BLAKE3_NO_SSE2",
+++        "BLAKE3_NO_SSE41"
+++      ]
+++     }),
++     includes = ["include"],
++     linkopts = select({
++         "@bazel_tools//src/conditions:windows": [],
++@@ -259,6 +257,7 @@ cc_library(
++         ],
++         "//conditions:default": [
++             "-pthread",
+++            "-lexecinfo",
++             "-ldl",
++             "-lm",
++         ],
++diff --git a/utils/bazel/llvm-project-overlay/llvm/config.bzl b/utils/bazel/llvm-project-overlay/llvm/config.bzl
++index 5beb3cc7c410..76c148c61421 100644
++--- a/utils/bazel/llvm-project-overlay/llvm/config.bzl
+++++ b/utils/bazel/llvm-project-overlay/llvm/config.bzl
++@@ -27,9 +27,9 @@ posix_defines = [
++     "LLVM_ENABLE_THREADS=1",
++     "HAVE_DEREGISTER_FRAME=1",
++     "HAVE_LIBPTHREAD=1",
++-    "HAVE_PTHREAD_GETNAME_NP=1",
+++    # "HAVE_PTHREAD_GETNAME_NP=0",
++     "HAVE_PTHREAD_H=1",
++-    "HAVE_PTHREAD_SETNAME_NP=1",
+++    # "HAVE_PTHREAD_SETNAME_NP=0",
++     "HAVE_REGISTER_FRAME=1",
++     "HAVE_SETENV_R=1",
++     "HAVE_STRERROR_R=1",
++@@ -41,7 +41,7 @@ linux_defines = posix_defines + [
++     "_GNU_SOURCE",
++     "HAVE_LINK_H=1",
++     "HAVE_LSEEK64=1",
++-    "HAVE_MALLINFO=1",
+++    # "HAVE_MALLINFO=0",
++     "HAVE_SBRK=1",
++     "HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC=1",
++ ]
++diff --git a/utils/bazel/llvm-project-overlay/llvm/include/llvm/Config/config.h b/utils/bazel/llvm-project-overlay/llvm/include/llvm/Config/config.h
++index 167cdfcbdce9..d647275dfdd5 100644
++--- a/utils/bazel/llvm-project-overlay/llvm/include/llvm/Config/config.h
+++++ b/utils/bazel/llvm-project-overlay/llvm/include/llvm/Config/config.h
++@@ -133,13 +133,10 @@
++ /* #undef HAVE_LIBPSAPI */
++ 
++ /* Define to 1 if you have the `pthread' library (-lpthread). */
++-#define HAVE_LIBPTHREAD 1
++ 
++ /* Define to 1 if you have the `pthread_getname_np' function. */
++-#define HAVE_PTHREAD_GETNAME_NP 1
++ 
++ /* Define to 1 if you have the `pthread_setname_np' function. */
++-#define HAVE_PTHREAD_SETNAME_NP 1
++ 
++ /* Define to 1 if you have the <link.h> header file. */
++ /* HAVE_LINK_H defined in Bazel */
+diff --git a/third_party/llvm/workspace.bzl b/third_party/llvm/workspace.bzl
+index 5c61810c5f0..b6011fd59a3 100644
+--- a/third_party/llvm/workspace.bzl
++++ b/third_party/llvm/workspace.bzl
+@@ -17,7 +17,7 @@ def repo(name):
+         ],
+         build_file = "//third_party/llvm:llvm.BUILD",
+         patch_file = [
+-            "//third_party/llvm:build.patch",
++            "//third_party/llvm:alpine_build_fix.patch",
+             "//third_party/llvm:mathextras.patch",
+             "//third_party/llvm:toolchains.patch",
+             "//third_party/llvm:temporary.patch",  # Cherry-picks and temporary reverts. Do not remove even if temporary.patch is empty.
