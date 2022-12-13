@@ -25,6 +25,5 @@ RUN ln -s /usr/bin/python3 /usr/bin/python && \
     python -m pip install --upgrade pip numpy
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-COPY alpine.patch /alpine.patch
 COPY tensorflow-alpine.patch /tensorflow-alpine.patch
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
