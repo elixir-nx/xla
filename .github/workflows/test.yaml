@@ -35,7 +35,7 @@ jobs:
           cp ${DIR}/output/bazel /usr/local/bin/ && \
           rm -rf ${DIR}
       - name: Install hex
-        run: mix local.hex --force
+        run: mix local.hex --force && mix local.rebar --force
       # Prevent git from checking the repository owner and erroring with "dubious ownership"
       - run: git config --global --add safe.directory '*'
       # Build and upload the archive
