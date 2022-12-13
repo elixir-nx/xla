@@ -27,6 +27,7 @@ jobs:
           apk add --no-cache musl-dev make libexecinfo libexecinfo-dev && \
           apk add --no-cache coreutils gcc g++ linux-headers unzip zip && \
           apk add --no-cache automake gcc subversion && \
+          apk add --no-cache github-cli && \
           DIR=$(mktemp -d) && cd ${DIR} && \
           curl -sLO https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-dist.zip && \
           echo ${BAZEL_SHA256SUM} | sha256sum --check && \
