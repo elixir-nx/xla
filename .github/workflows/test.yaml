@@ -34,6 +34,8 @@ jobs:
           EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh && \
           cp ${DIR}/output/bazel /usr/local/bin/ && \
           rm -rf ${DIR}
+      - name: Install hex
+        run: mix local.hex --force
       # Prevent git from checking the repository owner and erroring with "dubious ownership"
       - run: git config --global --add safe.directory '*'
       # Build and upload the archive
