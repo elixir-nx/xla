@@ -108,8 +108,14 @@ defmodule XLA do
   end
 
   defp target() do
-    {cpu, os} = cpu_and_os()
-    "#{cpu}-#{os}-#{xla_target()}"
+    {cpu, os, abi} = cpu_and_os()
+    case abi do
+      "" ->
+        "#{cpu}-#{os}-#{xla_target()}"
+
+      abi ->
+        "#{cpu}-#{os}-#{abi}-#{xla_target()}"
+    end
   end
 
   defp cpu_and_os() do
@@ -117,9 +123,9 @@ defmodule XLA do
     |> List.to_string()
     |> String.split("-")
     |> case do
-      ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin"}
-      [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin"}
-      [cpu, _vendor, os | _] -> {cpu, os}
+      ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", ""}
+      [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin", ""}
+      [cpu, _vendor, os, abi] -> {cpu, os, abi}
       ["win32"] -> {"x86_64", "windows"}
     end
   end
