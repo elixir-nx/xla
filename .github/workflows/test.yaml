@@ -17,7 +17,6 @@ jobs:
       BAZEL_SHA256SUM: "ee801491ff0ec3a562422322a033c9afe8809b64199e4a94c7433d4e14e6b921  bazel-5.3.0-dist.zip"
       JAVA_HOME: "/usr/lib/jvm/default-jvm"
     steps:
-      - uses: actions/checkout@v3
       - name: Install system packages
         run: |
           apk update && apk upgrade && \
@@ -39,6 +38,7 @@ jobs:
         run: mix local.hex --force && mix local.rebar --force
       # Prevent git from checking the repository owner and erroring with "dubious ownership"
       - run: git config --global --add safe.directory '*'
+      - uses: actions/checkout@v3
       # Build and upload the archive
       - run: mix deps.get
       - run: .github/scripts/compile_unless_exists.sh
