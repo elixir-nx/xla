@@ -1,5 +1,7 @@
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_cuda_or_rocm",)
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_with_tpu_support",)
+load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
+load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_grpc_cc_dependencies",)
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "transitive_hdrs",)
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar",)
@@ -49,7 +51,12 @@ cc_binary(
   ])
   + if_cuda_or_rocm([
     "@org_tensorflow//tensorflow/compiler/xla/service:gpu_plugin",
+  ])
+  + if_cuda([
     "@org_tensorflow//tensorflow/compiler/xla/stream_executor:cuda_platform"
+  ])
+  + if_rocm([
+    "@org_tensorflow//tensorflow/compiler/xla/stream_executor:rocm_platform"
   ]),
   linkopts = ["-shared"],
   linkshared = 1,

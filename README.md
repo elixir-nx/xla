@@ -37,6 +37,10 @@ your CUDA version (like `cuda118`). When building from source it's enough to spe
 
 Note that all the precompiled binaries assume glibc 2.31 or newer.
 
+##### Notes for ROCm:
+
+The ROCm precompiled build is currently broken due to an issue in our TensorFlow version with ROCm 5.4. You can still compile for ROCm by changing `TENSORFLOW_GIT_REV` per the instructions [here](https://github.com/elixir-nx/xla/issues/29) and running `XLA_BUILD=true mix compile`.
+
 #### `XLA_BUILD`
 
 Defaults to `false`. If `true` the binary is built locally, which may be intended
