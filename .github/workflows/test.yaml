@@ -44,7 +44,7 @@ jobs:
       - run: .github/scripts/compile_unless_exists.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: ${{ matrix.xla_target }}
+          XLA_TARGET: cpu
       # - run: .github/scripts/upload_archives.sh
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
