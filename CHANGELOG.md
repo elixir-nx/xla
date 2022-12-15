@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.4.2](https://github.com/elixir-nx/xla/tree/v0.4.2) (2022-12-15)
+
+### Added
+
+* Precompiled binaries for Linux musl ([#31](https://github.com/elixir-nx/xla/pull/31))
+
+### Fixed
+
+* Partially fixed building for ROCm, see [notes](https://github.com/elixir-nx/xla/blob/e0352a1769ecdb93f7c829f7f184fd2b81d6ad3f/README.md#notes-for-rocm) ([#30](https://github.com/elixir-nx/xla/pull/30))
+
 ## [v0.4.1](https://github.com/elixir-nx/xla/tree/v0.4.1) (2022-12-08)
 
 ### Added
