@@ -34,8 +34,8 @@ $(BUILD_ARCHIVE): $(TENSORFLOW_DIR) extension/BUILD
 # Clones tensorflow
 $(TENSORFLOW_DIR):
 	mkdir -p $(TENSORFLOW_DIR) && \
-		cp patch_tensorflow.sh $(TENSORFLOW_DIR) && \
-		cp tensorflow-alpine.patch $(TENSORFLOW_DIR) && \
+		cp extension/patch_tensorflow.sh $(TENSORFLOW_DIR) && \
+		cp extension/tensorflow-alpine.patch $(TENSORFLOW_DIR) && \
 		cd $(TENSORFLOW_DIR) && \
 		git init && \
 		git remote add origin $(TENSORFLOW_GIT_REPO) && \
