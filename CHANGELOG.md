@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.4.3](https://github.com/elixir-nx/xla/tree/v0.4.3) (2022-12-15)
+
+### Fixed
+
+* Building with `XLA_BUILD` (regression from v0.4.2) ([#33](https://github.com/elixir-nx/xla/pull/33))
+
 ## [v0.4.2](https://github.com/elixir-nx/xla/tree/v0.4.2) (2022-12-15)
 
 ### Added
