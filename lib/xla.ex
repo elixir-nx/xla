@@ -126,7 +126,7 @@ defmodule XLA do
       ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", ""}
       [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin", ""}
       [cpu, _vendor, os, abi] -> {cpu, os, abi}
-      ["win32"] -> {"x86_64", "windows"}
+      ["win32"] -> {"x86_64", "windows", ""}
     end
   end
 
