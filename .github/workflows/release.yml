@@ -39,7 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # linux x86_64 cpu-musl
+  # linux x86_64 cpu musl
   alpine:
     runs-on: ubuntu-20.04
     strategy:
@@ -220,6 +220,51 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: ${{ matrix.xla_target }}
+      - run: .github/scripts/upload_archives.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # linux aarch64 cpu (cross-compiled)
+  linux_arm:
+    # We intentionally build on ubuntu 20 to compile against
+    # an older version of glibc
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "24"
+          elixir-version: "1.12.3"
+      # Setup the compilation environment
+      - uses: abhinavsingh/setup-bazel@v3
+        with:
+          version: "5.3.0"
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - run: python -m pip install --upgrade pip numpy
+      # Build and upload the archives
+      - run: mix deps.get
+      # Hide system OpenSSL as suggested in https://github.com/tensorflow/tensorflow/issues/48401#issuecomment-818377995
+      - run: sudo mv /usr/include/openssl /usr/include/openssl.original
+      - run: .github/scripts/compile_unless_exists.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+          # Explicitly cross-compile for arm64
+          BUILD_FLAGS: "--config=elinux_aarch64"
+          CC: gcc-9
+      - name: Rename archive
+        run: |
+          # Ensure tasks are compiled
+          mix compile
+          build_archive_dir=$(mix xla.info build_archive_dir)
+          if [[ -d $build_archive_dir ]]; then
+            archive_path=$(find $build_archive_dir -type f)
+            actual_archive_path="${archive_path/x86_64/aarch64}"
+            echo "$archive_path -> $actual_archive_path"
+            mv $archive_path $actual_archive_path
+          fi;
       - run: .github/scripts/upload_archives.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
