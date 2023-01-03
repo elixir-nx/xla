@@ -76,8 +76,8 @@ defmodule XLA do
       end
 
     bazel_build_flags_cpu =
-      case cpu_and_os() do
-        {"aarch64", "darwin"} -> ["--config=macos_arm64"]
+      case target_triplet() do
+        {"aarch64", "darwin", _} -> ["--config=macos_arm64"]
         _ -> []
       end
 
@@ -108,25 +108,34 @@ defmodule XLA do
   end
 
   defp target() do
-    {cpu, os, abi} = cpu_and_os()
-    case abi do
-      "" ->
-        "#{cpu}-#{os}-#{xla_target()}"
-
-      abi ->
-        "#{cpu}-#{os}-#{abi}-#{xla_target()}"
+    case target_triplet() do
+      {arch, os, nil} -> "#{arch}-#{os}-#{xla_target()}"
+      {arch, os, abi} -> "#{arch}-#{os}-#{abi}-#{xla_target()}"
     end
   end
 
-  defp cpu_and_os() do
-    :erlang.system_info(:system_architecture)
-    |> List.to_string()
-    |> String.split("-")
-    |> case do
-      ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", ""}
-      [cpu, _vendor, "darwin" <> _ | _] -> {cpu, "darwin", ""}
-      [cpu, _vendor, os, abi] -> {cpu, os, abi}
-      ["win32"] -> {"x86_64", "windows", ""}
+  defp target_triplet() do
+    if target = System.get_env("XLA_TARGET_PLATFORM") do
+      case String.split(target, "-") do
+        [arch, os, abi] ->
+          {arch, os, abi}
+
+        [arch, os] ->
+          {arch, os, nil}
+
+        other ->
+          raise "expected XLA_TARGET_PLATFORM to be either ARCHITECTURE-OS-ABI or ARCHITECTURE-OS, got: #{other}"
+      end
+    else
+      :erlang.system_info(:system_architecture)
+      |> List.to_string()
+      |> String.split("-")
+      |> case do
+        ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", nil}
+        [arch, _vendor, "darwin" <> _ | _] -> {arch, "darwin", nil}
+        [arch, _vendor, os, abi] -> {arch, os, abi}
+        ["win32"] -> {"x86_64", "windows", nil}
+      end
     end
   end
 

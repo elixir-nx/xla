@@ -58,6 +58,12 @@ you need to make sure the build matches your OS, CPU architecture and the XLA ta
 The directory to store the downloaded and built archives in. Defaults to the standard
 cache location for the given operating system.
 
+#### `XLA_TARGET_PLATFORM`
+
+The target triplet describing the target platform, such as `aarch64-linux-gcc`. By default
+this target is inferred for the host, however you may want to override this when cross-compiling
+the project using Nerves.
+
 ## Building from source
 
 To build the XLA binaries locally you need to set `XLA_BUILD=true` and possibly `XLA_TARGET`.
