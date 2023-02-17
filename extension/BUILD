@@ -24,6 +24,7 @@ cc_binary(
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:qr",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:svd",
     "@org_tensorflow//tensorflow/compiler/xla/client/lib:self_adjoint_eig",
+    "@org_tensorflow//tensorflow/compiler/xla/client/lib:sorting",
     "@org_tensorflow//tensorflow/compiler/xla:literal",
     "@org_tensorflow//tensorflow/compiler/xla:shape_util",
     "@org_tensorflow//tensorflow/compiler/xla:status",
