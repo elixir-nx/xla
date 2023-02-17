@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.4.4](https://github.com/elixir-nx/xla/tree/v0.4.4) (2023-02-17)
+
+### Added
+
+* Sorting library ([#39](https://github.com/elixir-nx/xla/pull/39))
+
 ## [v0.4.3](https://github.com/elixir-nx/xla/tree/v0.4.3) (2022-12-15)
 
 ### Fixed
