@@ -21,7 +21,7 @@ only the host CPU.
 | --- | --- |
 | cpu | |
 | tpu | libtpu |
-| cuda118 | CUDA 11.8+, cuDNN 8.6+ (recommended) |
+| cuda118 | CUDA 11.8+, cuDNN 8.7+ (recommended) |
 | cuda114 | CUDA 11.4+, cuDNN 8.2+ |
 | cuda111 | CUDA 11.1+, cuDNN 8.0.5+ |
 | cuda | CUDA x.y, cuDNN |
