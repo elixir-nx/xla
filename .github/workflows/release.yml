@@ -156,13 +156,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+          # Note: we use exact references, because the images may be updated with cuDNN
+          # version bumps unexpectedly
+          # - container: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+          - container: nvidia/cuda@sha256:bb8379ce06f114591a64031c31d4f0a42a711b7fe73a805711a1821835b36c41
             xla_target: cuda111
             python: "3.9"
-          - container: nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04
+          # - container: nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04
+          - container: nvidia/cuda@sha256:275d35f7985cfe12dc3e6e40a3df5fff2bb217b1c248f0f70dadaa298d1b938b
             xla_target: cuda114
             python: "3.9"
-          - container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+          # - container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+          - container: nvidia/cuda@sha256:3e11776b02b6bb3a0e707e68b9b2524e3cfc436d2ca8fb1aef60c999cff5064b
             xla_target: cuda118
             python: "3.9"
     container: ${{ matrix.container }}
