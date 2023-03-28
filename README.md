@@ -24,8 +24,8 @@ only the host CPU.
 | cuda118 | CUDA 11.8+, cuDNN 8.7+ (recommended) |
 | cuda114 | CUDA 11.4+, cuDNN 8.2+ |
 | cuda111 | CUDA 11.1+, cuDNN 8.0.5+ |
-| cuda | CUDA x.y, cuDNN |
-| rocm | ROCm |
+| cuda | CUDA x.y, cuDNN (building from source only) |
+| rocm | ROCm (building from source only) |
 
 To use XLA with NVidia GPU you need [CUDA](https://developer.nvidia.com/cuda-downloads)
 and [cuDNN](https://developer.nvidia.com/cudnn) compatible with your GPU drivers.
