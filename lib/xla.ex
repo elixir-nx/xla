@@ -229,8 +229,8 @@ defmodule XLA do
   defp download(url, dest) do
     command =
       case network_tool() do
-        :curl -> "curl --fail -L #{url} -o #{dest}"
-        :wget -> "wget -O #{dest} #{url}"
+        :curl -> "curl --fail -L -o #{dest} #{curl_options()} #{url}"
+        :wget -> "wget -O #{dest} #{wget_options()} #{url}"
       end
 
     case System.shell(command) do
@@ -242,8 +242,8 @@ defmodule XLA do
   defp get(url) do
     command =
       case network_tool() do
-        :curl -> "curl --fail --silent -L #{url}"
-        :wget -> "wget -q -O - #{url}"
+        :curl -> "curl --fail --silent -L #{curl_options()} #{url}"
+        :wget -> "wget -q -O - #{wget_options()} #{url}"
       end
 
     case System.shell(command) do
@@ -261,4 +261,24 @@ defmodule XLA do
   end
 
   defp executable_exists?(name), do: System.find_executable(name) != nil
+
+  defp http_headers() do
+    if headers = System.get_env("XLA_HTTP_HEADERS") do
+      headers
+      |> String.split(";", trim: true)
+      |> Enum.map(&String.trim/1)
+    else
+      []
+    end
+  end
+
+  defp curl_options() do
+    headers = http_headers()
+    Enum.map_join(headers, " ", &"-H '#{&1}'")
+  end
+
+  defp wget_options() do
+    headers = http_headers()
+    Enum.map_join(headers, " ", &"--header='#{&1}'")
+  end
 end
