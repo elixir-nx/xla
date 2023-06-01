@@ -64,6 +64,12 @@ The target triplet describing the target platform, such as `aarch64-linux-gcc`. 
 this target is inferred for the host, however you may want to override this when cross-compiling
 the project using Nerves.
 
+#### `XLA_HTTP_HEADERS`
+
+Headers to use when querying and downloading the precompiled archive. By default the
+requests are sent to GitHub, unless `XLA_ARCHIVE_URL` specifies otherwise. The headers
+should be a list following this format: `Key1: Value1; Key2: value2`.
+
 ## Building from source
 
 To build the XLA binaries locally you need to set `XLA_BUILD=true` and possibly `XLA_TARGET`.
