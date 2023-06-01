@@ -68,7 +68,7 @@ the project using Nerves.
 
 Headers to use when querying and downloading the precompiled archive. By default the
 requests are sent to GitHub, unless `XLA_ARCHIVE_URL` specifies otherwise. The headers
-should be a list following this format: `Key1: Value1;Key2: value2`.
+should be a list following this format: `Key1: Value1; Key2: value2`.
 
 ## Building from source
 
