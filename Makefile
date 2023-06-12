@@ -9,47 +9,43 @@ TEMP ?= $(HOME)/.cache
 # Public configuration
 BUILD_MODE ?= opt # can also be dbg
 BUILD_CACHE ?= $(TEMP)/xla_extension
-TENSORFLOW_GIT_REPO ?= https://github.com/tensorflow/tensorflow.git
+OPENXLA_GIT_REPO ?= https://github.com/openxla/xla.git
 
-# Tensorflow 2.11.0
-TENSORFLOW_GIT_REV ?= d5b57ca93e506df258271ea00fc29cf98383a374
+OPENXLA_GIT_REV ?= c1e4a16e77a7ba2000003ccade3ffba3749ada35
 
 # Private configuration
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
-TENSORFLOW_NS = tf-$(TENSORFLOW_GIT_REV)
-TENSORFLOW_DIR = $(BUILD_CACHE)/$(TENSORFLOW_NS)
-TENSORFLOW_XLA_EXTENSION_NS = tensorflow/compiler/xla/extension
-TENSORFLOW_XLA_EXTENSION_DIR = $(TENSORFLOW_DIR)/$(TENSORFLOW_XLA_EXTENSION_NS)
-TENSORFLOW_XLA_BUILD_ARCHIVE = $(TENSORFLOW_DIR)/bazel-bin/$(TENSORFLOW_XLA_EXTENSION_NS)/xla_extension.tar.gz
+OPENXLA_NS = xla-$(OPENXLA_GIT_REV)
+OPENXLA_DIR = $(BUILD_CACHE)/$(OPENXLA_NS)
+OPENXLA_XLA_EXTENSION_NS = xla/extension
+OPENXLA_XLA_EXTENSION_DIR = $(OPENXLA_DIR)/$(OPENXLA_XLA_EXTENSION_NS)
+OPENXLA_XLA_BUILD_ARCHIVE = $(OPENXLA_DIR)/bazel-bin/$(OPENXLA_XLA_EXTENSION_NS)/xla_extension.tar.gz
 
-$(BUILD_ARCHIVE): $(TENSORFLOW_DIR) extension/BUILD
-	rm -f $(TENSORFLOW_XLA_EXTENSION_DIR) && \
-		ln -s "$(ROOT_DIR)/extension" $(TENSORFLOW_XLA_EXTENSION_DIR) && \
-		cd $(TENSORFLOW_DIR) && \
-		bazel build $(BAZEL_FLAGS) $(BUILD_FLAGS) $(BUILD_INTERNAL_FLAGS) //$(TENSORFLOW_XLA_EXTENSION_NS):xla_extension && \
+$(BUILD_ARCHIVE): $(OPENXLA_DIR) extension/BUILD
+	rm -f $(OPENXLA_XLA_EXTENSION_DIR) && \
+		ln -s "$(ROOT_DIR)/extension" $(OPENXLA_XLA_EXTENSION_DIR) && \
+		cd $(OPENXLA_DIR) && \
+		bazel build $(BAZEL_FLAGS) $(BUILD_FLAGS) $(BUILD_INTERNAL_FLAGS) //$(OPENXLA_XLA_EXTENSION_NS):xla_extension && \
 		mkdir -p $(dir $(BUILD_ARCHIVE)) && \
-		cp -f $(TENSORFLOW_XLA_BUILD_ARCHIVE) $(BUILD_ARCHIVE)
+		cp -f $(OPENXLA_XLA_BUILD_ARCHIVE) $(BUILD_ARCHIVE)
 
-# Clones tensorflow
-$(TENSORFLOW_DIR):
-	mkdir -p $(TENSORFLOW_DIR) && \
-		cp extension/patch_tensorflow.sh $(TENSORFLOW_DIR) && \
-		cp extension/tensorflow-alpine.patch $(TENSORFLOW_DIR) && \
-		cd $(TENSORFLOW_DIR) && \
+# Clones OPENXLA
+$(OPENXLA_DIR):
+	mkdir -p $(OPENXLA_DIR) && \
+		cd $(OPENXLA_DIR) && \
 		git init && \
-		git remote add origin $(TENSORFLOW_GIT_REPO) && \
-		git fetch --depth 1 origin $(TENSORFLOW_GIT_REV) && \
+		git remote add origin $(OPENXLA_GIT_REPO) && \
+		git fetch --depth 1 origin $(OPENXLA_GIT_REV) && \
 		git checkout FETCH_HEAD && \
-		sh patch_tensorflow.sh && \
-		rm $(TENSORFLOW_DIR)/.bazelversion
+		rm $(OPENXLA_DIR)/.bazelversion
 
-# Print Tensorflow Dir
+# Print OPENXLA Dir
 PTD:
-	@ echo $(TENSORFLOW_DIR)
+	@ echo $(OPENXLA_DIR)
 
 clean:
-	cd $(TENSORFLOW_DIR) && bazel clean --expunge
-	rm -f $(TENSORFLOW_XLA_EXTENSION_DIR)
-	rm -rf $(TENSORFLOW_DIR)
+	cd $(OPENXLA_DIR) && bazel clean --expunge
+	rm -f $(OPENXLA_XLA_EXTENSION_DIR)
+	rm -rf $(OPENXLA_DIR)
 	rm -rf $(TARGET_DIR)
