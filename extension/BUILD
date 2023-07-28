@@ -1,9 +1,9 @@
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_cuda_or_rocm",)
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "if_with_tpu_support",)
+load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
+load("@tsl//tsl:tsl.bzl", "if_with_tpu_support",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_grpc_cc_dependencies",)
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "transitive_hdrs",)
+load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
+load("@tsl//tsl:tsl.bzl", "transitive_hdrs",)
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar",)
 
 package(default_visibility=["//visibility:private"])
@@ -13,53 +13,90 @@ package(default_visibility=["//visibility:private"])
 cc_binary(
   name = "libxla_extension.so",
   deps = [
+    "//xla:xla_proto_cc_impl",
+    "//xla:xla_data_proto_cc_impl",
+    "//xla/service:hlo_proto_cc_impl",
+    "//xla/service:memory_space_assignment_proto_cc_impl",
+    "//xla/service/gpu:backend_configs_cc_impl",
+    "//xla/stream_executor:dnn_proto_cc_impl",
+    "//xla:literal",
+    "//xla:shape_util",
+    "//xla:status",
+    "//xla:statusor",
+    "//xla:types",
+    "//xla:util",
+    "//xla/client:xla_computation",
+    "//xla/mlir/utils:error_util",
+    "//xla/mlir_hlo",
+    "//xla/mlir_hlo:all_passes",
+    "//xla/pjrt:mlir_to_hlo",
+    "//xla/client/lib:lu_decomposition",
+    "//xla/client/lib:math",
+    "//xla/client/lib:qr",
+    "//xla/client/lib:svd",
+    "//xla/client/lib:self_adjoint_eig",
+    "//xla/client/lib:sorting",
+    "//xla/mlir_hlo:mhlo_passes",
+    "//xla/translate/hlo_to_mhlo:hlo_to_mlir_hlo",
+    "//xla/pjrt:interpreter_device",
+    "//xla/pjrt:pjrt_client",
+    "//xla/pjrt:pjrt_compiler",
+    "//xla/pjrt:tfrt_cpu_pjrt_client",
+    "//xla/pjrt:pjrt_c_api_client",
+    "//xla/pjrt:tpu_client",
+    "//xla/pjrt:pjrt_plugin_device_client",
+    "//xla/pjrt:pjrt_plugin_device_client_headers",
+    "//xla/pjrt/distributed",
+    "//xla/pjrt/gpu:se_gpu_pjrt_client",
+    "//xla/pjrt/distributed:client",
+    "//xla/pjrt/distributed:service",
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
+    "@com_google_protobuf//:protobuf",
+    "@llvm-project//llvm:Support",
+    "@llvm-project//mlir:FuncDialect",
+    "@llvm-project//mlir:IR",
+    "@llvm-project//mlir:Parser",
+    "@llvm-project//mlir:Pass",
+    "@llvm-project//mlir:ReconcileUnrealizedCasts",
+    "@llvm-project//mlir:SparseTensorDialect",
     "@tf_runtime//:core_runtime",
     "@tf_runtime//:hostcontext",
     "@tf_runtime//third_party/llvm_derived:unique_any",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:lu_decomposition",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:math",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:qr",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:svd",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:self_adjoint_eig",
-    "@org_tensorflow//tensorflow/compiler/xla/client/lib:sorting",
-    "@org_tensorflow//tensorflow/compiler/xla:literal",
-    "@org_tensorflow//tensorflow/compiler/xla:shape_util",
-    "@org_tensorflow//tensorflow/compiler/xla:status",
-    "@org_tensorflow//tensorflow/compiler/xla:statusor",
-    "@org_tensorflow//tensorflow/compiler/xla:types",
-    "@org_tensorflow//tensorflow/compiler/xla:util",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:mlir_to_hlo",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:interpreter_device",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_compiler",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:tfrt_cpu_pjrt_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:pjrt_c_api_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt:tpu_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/gpu:se_gpu_pjrt_client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:client",
-    "@org_tensorflow//tensorflow/compiler/xla/pjrt/distributed:service",
-    "@org_tensorflow//tensorflow/core:lib",
-    "@org_tensorflow//tensorflow/core:lib_internal_impl",
+    "@tsl//tsl/platform:errors",
+    "@tsl//tsl/platform:fingerprint",
+    "@tsl//tsl/platform:float8",
+    "@tsl//tsl/platform:statusor",
+    "@tsl//tsl/platform:env_impl",
+    "@tsl//tsl/platform:tensor_float_32_utils",
+    "@tsl//tsl/profiler/utils:time_utils_impl",
+    "@tsl//tsl/profiler/backends/cpu:annotation_stack_impl",
+    "@tsl//tsl/profiler/backends/cpu:traceme_recorder_impl",
+    "@tsl//tsl/protobuf:autotuning_proto_cc_impl",
+    "@tsl//tsl/protobuf:protos_all_cc_impl",
+    "@tsl//tsl/protobuf:dnn_proto_cc_impl",
+    "@tsl//tsl/framework:allocator",
+    "@tsl//tsl/framework:allocator_registry_impl",
+    "@tsl//tsl/util:determinism",
   ]
   # GRPC Dependencies (needed for PjRt distributed)
-  + tf_grpc_cc_dependencies()
+  + tsl_grpc_cc_dependencies()
   + if_with_tpu_support([
-    "@org_tensorflow//tensorflow/core/tpu:tpu_api_dlsym_initializer",
+    "@tsl//tsl/core/tpu:tpu_api_dlsym_initializer",
   ])
   + if_cuda_or_rocm([
-    "@org_tensorflow//tensorflow/compiler/xla/service:gpu_plugin",
+    "//xla/service:gpu_plugin",
   ])
   + if_cuda([
-    "@org_tensorflow//tensorflow/compiler/xla/stream_executor:cuda_platform"
+    "//xla/stream_executor:cuda_platform"
   ])
   + if_rocm([
-    "@org_tensorflow//tensorflow/compiler/xla/stream_executor:rocm_platform"
+    "//xla/stream_executor:rocm_platform"
   ]),
+  copts = ["-fvisibility=default"],
   linkopts = ["-shared"],
+  features = ["-use_header_modules"],
   linkshared = 1,
 )
 
@@ -79,6 +116,7 @@ genrule(
   name = "xla_extension_headers",
   srcs = [
     ":xla_extension_dep_headers",
+    "//xla/mlir_hlo:hlo_ops_enums_inc_gen",
   ],
   outs = ["include"],
   cmd = """
