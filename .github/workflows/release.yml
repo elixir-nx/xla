@@ -170,6 +170,10 @@ jobs:
           - container: nvidia/cuda@sha256:3e11776b02b6bb3a0e707e68b9b2524e3cfc436d2ca8fb1aef60c999cff5064b
             xla_target: cuda118
             python: "3.9"
+          # - container: nvidia/cuda:12.0.0-cudnn8-devel-ubuntu20.04
+          - container: nvidia/cuda@sha256:c004833aa563c0c1068a9fe3f77d92ce1a07425b1ddc8637ba4f274e63403b26
+            xla_target: cuda120
+            python: "3.9"
     container: ${{ matrix.container }}
     env:
       # This env is normally set by default, but we need to mirror it into the container
