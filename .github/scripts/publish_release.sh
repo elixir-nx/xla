@@ -24,6 +24,6 @@ if [[ ! $REPLY =~ ^[yY]$ ]]; then
   exit 0
 fi
 
-gh release create $tag --notes ""
+gh release create $tag --draft --notes ""
 
 echo "Successfully created release $tag. Remember to wait for the release build to finish before publishing the Hex package."
