@@ -179,10 +179,8 @@ jobs:
       # This env is normally set by default, but we need to mirror it into the container
       # ourselves (used by the actions/setup-beam).
       ImageOS: ubuntu20
-      # Set the missing utf-8 locales, otherwise Elixir warns
-      LANG: en_US.UTF-8
-      LANGUAGE: en_US:en
-      LC_ALL: en_US.UTF-8
+      # Set the missing UTF-8 locale, otherwise Elixir warns
+      LC_ALL: C.UTF-8
       # Make sure installing packages (like tzdata) doesn't prompt for configuration
       DEBIAN_FRONTEND: noninteractive
     steps:
@@ -194,15 +192,11 @@ jobs:
           # Add repository with the latest git version for action/checkout to properly clone the repo
           add-apt-repository ppa:git-core/ppa
           # We run as root, so sudo is not necessary per se, but some actions (like setup-bazel) make use of it
-          apt-get update && apt-get install -y locales ca-certificates curl git sudo unzip wget
+          apt-get update && apt-get install -y ca-certificates curl git sudo unzip wget
           # Install GitHub CLI used by our scripts
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
           apt-get update && apt-get install -y gh
-          # Update locales
-          echo "$LANG UTF-8" >> /etc/locale.gen
-          locale-gen
-          update-locale LANG=$LANG
       # Prevent git from checking the repository owner and erroring with "dubious ownership"
       - run: git config --global --add safe.directory '*'
       # Proceed with the regular steps

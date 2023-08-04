@@ -4,10 +4,8 @@ FROM nvidia/cuda:${CUDA_VERSION}-cudnn8-devel-ubuntu20.04
 
 ARG XLA_TARGET
 
-# Set the missing utf-8 locales, otherwise Elixir warns
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+# Set the missing UTF-8 locale, otherwise Elixir warns
+ENV LC_ALL C.UTF-8
 
 # Make sure installing packages (like tzdata) doesn't prompt for configuration
 ENV DEBIAN_FRONTEND noninteractive
@@ -19,11 +17,7 @@ RUN apt-get update && apt-get install -y software-properties-common && \
     # Add repository with the latest git version
     add-apt-repository ppa:git-core/ppa && \
     # Install basic system dependencies
-    apt-get update && apt-get install -y locales ca-certificates curl git unzip wget && \
-    # Update locales
-    echo "$LANG UTF-8" >> /etc/locale.gen && \
-    locale-gen && \
-    update-locale LANG=$LANG
+    apt-get update && apt-get install -y ca-certificates curl git unzip wget
 
 # Install Bazel
 RUN apt-get install -y apt-transport-https curl gnupg && \
