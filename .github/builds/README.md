@@ -8,10 +8,10 @@ The build can be run on any machine with Docker installed. First, you
 need to build the image with CUDA/cuDNN and all other the dependencies
 
 ```shell
-docker build -t xla-cuda111 -f Dockerfile.cuda --build-arg CUDA_VERSION=11.1.1 --build-arg XLA_TARGET=cuda111 .
-docker build -t xla-cuda114 -f Dockerfile.cuda --build-arg CUDA_VERSION=11.4.3 --build-arg XLA_TARGET=cuda114 .
-docker build -t xla-cuda118 -f Dockerfile.cuda --build-arg CUDA_VERSION=11.8.0 --build-arg XLA_TARGET=cuda118 .
-docker build -t xla-cuda120 -f Dockerfile.cuda --build-arg CUDA_VERSION=12.0.0 --build-arg XLA_TARGET=cuda120 .
+docker build -t xla-cuda111 -f cuda.Dockerfile --build-arg CUDA_VERSION=11.1.1 --build-arg XLA_TARGET=cuda111 .
+docker build -t xla-cuda114 -f cuda.Dockerfile --build-arg CUDA_VERSION=11.4.3 --build-arg XLA_TARGET=cuda114 .
+docker build -t xla-cuda118 -f cuda.Dockerfile --build-arg CUDA_VERSION=11.8.0 --build-arg XLA_TARGET=cuda118 .
+docker build -t xla-cuda120 -f cuda.Dockerfile --build-arg CUDA_VERSION=12.0.0 --build-arg XLA_TARGET=cuda120 .
 ```
 
 Then, start a container. It clones XLA from GitHub, compiles and packages
