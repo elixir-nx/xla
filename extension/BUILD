@@ -1,5 +1,4 @@
 load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
-load("@tsl//tsl:tsl.bzl", "if_with_tpu_support",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
@@ -82,9 +81,6 @@ cc_binary(
   ]
   # GRPC Dependencies (needed for PjRt distributed)
   + tsl_grpc_cc_dependencies()
-  + if_with_tpu_support([
-    "//xla/stream_executor/tpu:tpu_initializer_framework_helper",
-  ])
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",
   ])
