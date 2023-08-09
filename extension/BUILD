@@ -83,7 +83,7 @@ cc_binary(
   # GRPC Dependencies (needed for PjRt distributed)
   + tsl_grpc_cc_dependencies()
   + if_with_tpu_support([
-    "@tsl//tsl/core/tpu:tpu_api_dlsym_initializer",
+    "//xla/stream_executor/tpu:tpu_initializer_framework_helper",
   ])
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",

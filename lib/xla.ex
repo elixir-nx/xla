@@ -78,7 +78,7 @@ defmodule XLA do
   def make_env() do
     bazel_build_flags_accelerator =
       case xla_target() do
-        "cuda" <> _ -> ["--config=cuda"]
+        "cuda" <> _ -> [~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_52,sm_60,sm_70,sm_80,compute_90"/]
         "rocm" <> _ -> ["--config=rocm", "--action_env=HIP_PLATFORM=hcc"]
         "tpu" <> _ -> ["--config=tpu"]
         _ -> []
