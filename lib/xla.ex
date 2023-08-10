@@ -78,10 +78,20 @@ defmodule XLA do
   def make_env() do
     bazel_build_flags_accelerator =
       case xla_target() do
-        "cuda" <> _ -> ["--config=cuda"]
-        "rocm" <> _ -> ["--config=rocm", "--action_env=HIP_PLATFORM=hcc"]
-        "tpu" <> _ -> ["--config=tpu"]
-        _ -> []
+        "cuda" <> _ ->
+          [
+            # See https://github.com/google/jax/blob/c9cf6b44239e373cba384936dcfeff60e39ad560/.bazelrc#L68
+            ~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_52,sm_60,sm_70,compute_80"/
+          ]
+
+        "rocm" <> _ ->
+          ["--config=rocm", "--action_env=HIP_PLATFORM=hcc"]
+
+        "tpu" <> _ ->
+          ["--config=tpu"]
+
+        _ ->
+          []
       end
 
     bazel_build_flags_cpu =
