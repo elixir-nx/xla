@@ -46,16 +46,7 @@ defmodule XLA do
   defp xla_target() do
     target = System.get_env("XLA_TARGET", "cpu")
 
-    supported_xla_targets = [
-      "cpu",
-      "cuda",
-      "rocm",
-      "tpu",
-      "cuda111",
-      "cuda114",
-      "cuda118",
-      "cuda120"
-    ]
+    supported_xla_targets = ["cpu", "cuda", "rocm", "tpu", "cuda118", "cuda120"]
 
     unless target in supported_xla_targets do
       listing = supported_xla_targets |> Enum.map(&inspect/1) |> Enum.join(", ")

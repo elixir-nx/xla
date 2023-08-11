@@ -21,9 +21,8 @@ only the host CPU.
 | --- | --- |
 | cpu | |
 | tpu | libtpu |
-| cuda120 | CUDA 12.0+, cuDNN 8.8+ (recommended) |
-| cuda118 | CUDA 11.8+, cuDNN 8.7+ (recommended) |
-| cuda114 | CUDA 11.4+, cuDNN 8.2+ |
+| cuda120 | CUDA 12.0+, cuDNN 8.8+ |
+| cuda118 | CUDA 11.8+, cuDNN 8.7+ |
 | cuda | CUDA x.y, cuDNN (building from source only) |
 | rocm | ROCm (building from source only) |
 
