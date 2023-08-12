@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.5.0](https://github.com/elixir-nx/xla/tree/v0.5.0) (2023-08-13)
+
+### Added
+
+* Support for custom http headers ([#44](https://github.com/elixir-nx/xla/pull/44))
+* Support for CUDA 12
+
+### Changed
+
+* Migrated to OpenXLA source code ([#45](https://github.com/elixir-nx/xla/pull/45))
+
+### Removed
+
+* Dropped precompiled binary for CUDA 11.1 and CUDA 11.4
+* Dropped precompiled binary for Linux musl
+
 ## [v0.4.4](https://github.com/elixir-nx/xla/tree/v0.4.4) (2023-02-17)
 
 ### Added
