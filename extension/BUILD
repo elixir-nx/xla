@@ -17,6 +17,7 @@ cc_binary(
     "//xla/service:hlo_proto_cc_impl",
     "//xla/service:memory_space_assignment_proto_cc_impl",
     "//xla/service/gpu:backend_configs_cc_impl",
+    "//xla/service/gpu:hlo_op_profile_proto_cc_impl",
     "//xla/stream_executor:dnn_proto_cc_impl",
     "//xla/stream_executor/host:host_platform",
     "//xla:literal",
@@ -110,7 +111,6 @@ genrule(
   name = "xla_extension_headers",
   srcs = [
     ":xla_extension_dep_headers",
-    "//xla/mlir_hlo:hlo_ops_enums_inc_gen",
   ],
   outs = ["include"],
   cmd = """
@@ -147,6 +147,9 @@ genrule(
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done
+    # Files in xla/mlir_hlo include sibling headers from mhlo, so we
+    # need to mirror them in includes
+    cp -r $@/xla/mlir_hlo/mhlo $@
     """,
   )
 
