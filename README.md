@@ -160,9 +160,10 @@ for the list of available flags.
 To publish a new version of this package:
 
 1. Update version in `mix.exs`.
-2. Run `.github/scripts/publish_release.sh`.
+2. Create and push a new tag.
 3. Wait for the release workflow to build all the binaries.
-4. Publish the package to Hex.
+4. Publish the release from draft.
+5. Publish the package to Hex.
 
 ## License
 
