@@ -1,11 +1,28 @@
 name: Release
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
 jobs:
-  # linux x86_64 cpu/tpu
+  create_draft_release:
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create draft release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh release list | grep -q ${{ github.ref_name }}; then
+            gh release create --title ${{ github.ref_name }} --draft ${{ github.ref_name }}
+          fi
+
   linux:
+    name: "x86_64-linux-gnu-{cpu,tpu}"
+    needs: [create_draft_release]
     # We intentionally build on ubuntu 20 to compile against
     # an older version of glibc
     runs-on: ubuntu-20.04
@@ -25,67 +42,20 @@ jobs:
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archives
       - run: mix deps.get
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
           CC: gcc-9
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: tpu
           CC: gcc-9
-      - run: .github/scripts/upload_archives.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # # linux x86_64 cpu musl
-  # alpine:
-  #   runs-on: ubuntu-20.04
-  #   strategy:
-  #     fail-fast: false
-  #   container: hexpm/elixir:1.13.4-erlang-25.0.2-alpine-3.16.0
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     XLA_TARGET: cpu
-  #     BAZEL_VERSION: "5.3.0"
-  #     BAZEL_SHA256SUM: "ee801491ff0ec3a562422322a033c9afe8809b64199e4a94c7433d4e14e6b921  bazel-5.3.0-dist.zip"
-  #     JAVA_HOME: "/usr/lib/jvm/default-jvm"
-  #   steps:
-  #     - name: Install system packages
-  #       run: |
-  #         apk update && apk upgrade && \
-  #         apk add --no-cache python3 py3-pip python3-dev py3-numpy && \
-  #         apk add --no-cache libstdc++ openjdk11 && \
-  #         apk add --no-cache bash curl git wget && \
-  #         apk add --no-cache musl-dev make libexecinfo libexecinfo-dev && \
-  #         apk add --no-cache coreutils gcc g++ linux-headers unzip zip && \
-  #         apk add --no-cache automake gcc subversion && \
-  #         apk add --no-cache github-cli && \
-  #         DIR=$(mktemp -d) && cd ${DIR} && \
-  #         curl -sLO https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-dist.zip && \
-  #         echo ${BAZEL_SHA256SUM} | sha256sum --check && \
-  #         unzip bazel-${BAZEL_VERSION}-dist.zip && \
-  #         EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh && \
-  #         cp ${DIR}/output/bazel /usr/local/bin/ && \
-  #         rm -rf ${DIR}
-  #     - name: Install hex
-  #       run: mix local.hex --force && mix local.rebar --force
-  #     # Prevent git from checking the repository owner and erroring with "dubious ownership"
-  #     - run: git config --global --add safe.directory '*'
-  #     - uses: actions/checkout@v3
-  #     # Build and upload the archive
-  #     - run: mix deps.get
-  #     - run: .github/scripts/compile_unless_exists.sh
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         XLA_TARGET: cpu
-  #     - run: .github/scripts/upload_archives.sh
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # darwin x86_64 cpu
   macos:
+    name: "x86_64-darwin-cpu"
+    needs: [create_draft_release]
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
@@ -101,17 +71,15 @@ jobs:
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
           CC: gcc-9
-      - run: .github/scripts/upload_archives.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # darwin aarch64 cpu (cross-compiled)
   macos_arm:
+    name: "aarch64-darwin-cpu (cross-compiled)"
+    needs: [create_draft_release]
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
@@ -127,30 +95,18 @@ jobs:
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
+          XLA_TARGET_PLATFORM: "aarch64-darwin"
           # Explicitly cross-compile for arm64
           BUILD_FLAGS: "--config=macos_arm64"
           CC: gcc-9
-      - name: Rename archive
-        run: |
-          # Ensure tasks are compiled
-          mix compile
-          build_archive_dir=$(mix xla.info build_archive_dir)
-          if [[ -d $build_archive_dir ]]; then
-            archive_path=$(find $build_archive_dir -type f)
-            actual_archive_path="${archive_path/x86_64/aarch64}"
-            echo "$archive_path -> $actual_archive_path"
-            mv $archive_path $actual_archive_path
-          fi;
-      - run: .github/scripts/upload_archives.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # linux x86_64 cuda
   linux_cuda:
+    name: "x86_64-linux-gnu-${{ matrix.xla_target }}"
+    needs: [create_draft_release]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -211,16 +167,14 @@ jobs:
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: ${{ matrix.xla_target }}
-      - run: .github/scripts/upload_archives.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # linux aarch64 cpu (cross-compiled)
   linux_arm:
+    name: "aarch64-linux-gnu-cpu (cross-compiled)"
+    needs: [create_draft_release]
     # We intentionally build on ubuntu 20 to compile against
     # an older version of glibc
     runs-on: ubuntu-20.04
@@ -242,24 +196,11 @@ jobs:
       - run: mix deps.get
       # Hide system OpenSSL as suggested in https://github.com/tensorflow/tensorflow/issues/48401#issuecomment-818377995
       - run: sudo mv /usr/include/openssl /usr/include/openssl.original
-      - run: .github/scripts/compile_unless_exists.sh
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
+          XLA_TARGET_PLATFORM: "aarch64-linux-gnu"
           # Explicitly cross-compile for arm64
           BUILD_FLAGS: "--config=elinux_aarch64"
           CC: gcc-9
-      - name: Rename archive
-        run: |
-          # Ensure tasks are compiled
-          mix compile
-          build_archive_dir=$(mix xla.info build_archive_dir)
-          if [[ -d $build_archive_dir ]]; then
-            archive_path=$(find $build_archive_dir -type f)
-            actual_archive_path="${archive_path/x86_64/aarch64}"
-            echo "$archive_path -> $actual_archive_path"
-            mv $archive_path $actual_archive_path
-          fi;
-      - run: .github/scripts/upload_archives.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
