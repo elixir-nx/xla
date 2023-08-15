@@ -105,6 +105,9 @@ jobs:
           CC: gcc-9
 
   linux_cuda:
+    # Currently the build takes longer than the job time limit (6h),
+    # so we always build these off-CI
+    if: false
     name: "x86_64-linux-gnu-${{ matrix.xla_target }}"
     needs: [create_draft_release]
     runs-on: ubuntu-20.04
@@ -112,15 +115,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Note: we use exact references, because the images may be updated with cuDNN
-          # version bumps unexpectedly
-          # - container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
-          - container: nvidia/cuda@sha256:3e11776b02b6bb3a0e707e68b9b2524e3cfc436d2ca8fb1aef60c999cff5064b
+          - container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
             xla_target: cuda118
+            cuda_version: "11.8.0"
+            cudnn_version: "8.6.0"
             python: "3.9"
-          # - container: nvidia/cuda:12.0.0-cudnn8-devel-ubuntu20.04
-          - container: nvidia/cuda@sha256:c004833aa563c0c1068a9fe3f77d92ce1a07425b1ddc8637ba4f274e63403b26
+          - container: nvidia/cuda:12.0.0-cudnn8-devel-ubuntu20.04
             xla_target: cuda120
+            cuda_version: "12.0.0"
+            cudnn_version: "8.8.0"
             python: "3.9"
     container: ${{ matrix.container }}
     env:
@@ -145,6 +148,12 @@ jobs:
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
           apt-get update && apt-get install -y gh
+          # Install a specific cuDNN version over the default one
+          cuda_version="${{ matrix.cuda_version }}"
+          cudnn_version="${{ matrix.cudnn_version }}"
+          cudnn_package_version="$(apt-cache madison libcudnn8 | grep "${cudnn_version}.*-1+cuda${cuda_version%.*}")"
+          apt-get install -y --allow-downgrades --allow-change-held-packages libcudnn8=$cudnn_package_version libcudnn8-dev=$cudnn_package_version
+
       # Prevent git from checking the repository owner and erroring with "dubious ownership"
       - run: git config --global --add safe.directory '*'
       # Proceed with the regular steps
