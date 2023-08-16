@@ -7,7 +7,7 @@ defmodule XLA.MixProject do
     [
       app: :xla,
       version: @version,
-      description: "Precompiled Google's XLA binaries",
+      description: "Precompiled XLA binaries",
       elixir: "~> 1.12",
       deps: deps(),
       compilers: Mix.compilers() ++ if(build?(), do: [:elixir_make], else: []),

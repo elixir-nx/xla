@@ -1,6 +1,6 @@
 # XLA
 
-Precompiled Google's XLA binaries for [EXLA](https://github.com/elixir-nx/nx/tree/main/exla).
+Precompiled [XLA](https://github.com/openxla/xla) binaries for [EXLA](https://github.com/elixir-nx/nx/tree/main/exla).
 
 ## Usage
 
@@ -22,7 +22,7 @@ only the host CPU.
 | cpu | |
 | tpu | libtpu |
 | cuda120 | CUDA 12.0+, cuDNN 8.8+ |
-| cuda118 | CUDA 11.8+, cuDNN 8.7+ |
+| cuda118 | CUDA 11.8+, cuDNN 8.6+ |
 | cuda | CUDA x.y, cuDNN (building from source only) |
 | rocm | ROCm (building from source only) |
 
@@ -36,9 +36,11 @@ your CUDA version (like `cuda118`). When building from source it's enough to spe
 
 Note that all the precompiled binaries assume glibc 2.31 or newer.
 
-##### Notes for ROCm:
+##### Notes for ROCm
 
-The ROCm precompiled build is currently broken due to an issue in our TensorFlow version with ROCm 5.4. You can still compile for ROCm by changing `TENSORFLOW_GIT_REV` per the instructions [here](https://github.com/elixir-nx/xla/issues/29) and running `XLA_BUILD=true mix compile`.
+For GPU support, we primarily rely on CUDA, because of the popularity and availability
+in the cloud. In case you use ROCm and it does not work, please open up an issue and
+we will be happy to help.
 
 #### `XLA_BUILD`
 
@@ -102,10 +104,10 @@ asdf global bazel 5.3.0
 
 #### GCC
 
-You may have issues with newer and older versions of GCC. TensorFlow builds are known to work
-with GCC versions between 7.5 and 9.3. If your system uses a newer GCC version, you can install
-an older version and tell Bazel to use it with `export CC=/path/to/gcc-{version}` where version
-is the GCC version you installed
+You may have issues with newer and older versions of GCC. XLA builds are known to work
+with GCC versions between 7.5 and 9.3. If your system uses a newer GCC version, you can
+install an older version and tell Bazel to use it with `export CC=/path/to/gcc-{version}`
+where version is the GCC version you installed.
 
 #### Python and asdf
 
@@ -114,11 +116,12 @@ function to lookup the specified version of a given binary, this approach preven
 being able to correctly build XLA. The error is `unknown command: python. Perhaps you have to reshim?`.
 There are two known workarounds:
 
-1. Use a separate installer or explicitly change your `$PATH` to point to a Python installation (note
-   the build process looks for `python`, not `python3`). For example, on Homebrew on macOS, you would do:
+1. Explicitly change your `$PATH` to point to a Python installation (note the build process
+   looks for `python`, not `python3`). For example:
 
     ```shell
-    export PATH=/usr/local/opt/python@3.9/libexec/bin:/usr/local/bin:$PATH
+    # Point directly to a specific Python version
+    export PATH=$HOME/.asdf/installs/python/3.10.8/bin:$PATH
     ```
 
 2. Use the [`asdf direnv`](https://github.com/asdf-community/asdf-direnv) plugin to install [`direnv 2.20.0`](https://direnv.net).
@@ -143,7 +146,7 @@ All you need is setting `XLA_TARGET=tpu`.
 
 You can use the following env vars to customize your build:
 
-  * `BUILD_CACHE` - controls where to store Tensorflow source and builds
+  * `BUILD_CACHE` - controls where to store XLA source and builds
 
   * `BUILD_FLAGS` - additional flags passed to Bazel
 
@@ -167,8 +170,8 @@ To publish a new version of this package:
 
 ## License
 
-Note that the build artifacts are a result of compiling Google XLA,
-hence are under their own license. See [Tensorflow](https://github.com/tensorflow/tensorflow).
+Note that the build artifacts are a result of compiling XLA, hence are under
+the respective license. See [XLA](https://github.com/openxla/xla).
 
 ```text
 Copyright (c) 2020 Sean Moriarity
