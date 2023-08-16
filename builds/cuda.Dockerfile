@@ -33,8 +33,6 @@ RUN apt-get install -y apt-transport-https curl gnupg && \
   apt-get update && apt-get install -y bazel-5.3.0 && \
   ln -s /usr/bin/bazel-5.3.0 /usr/bin/bazel
 
-ENV USE_BAZEL_VERSION 5.3.0
-
 # Install Python and the necessary global dependencies
 RUN apt-get install -y python3 python3-pip && \
   ln -s /usr/bin/python3 /usr/bin/python && \
