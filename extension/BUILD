@@ -1,9 +1,10 @@
 load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
+load("@tsl//tsl:tsl.bzl", "if_with_tpu_support",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
 load("@tsl//tsl:tsl.bzl", "transitive_hdrs",)
-load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar",)
 
 package(default_visibility=["//visibility:private"])
 
@@ -17,9 +18,7 @@ cc_binary(
     "//xla/service:hlo_proto_cc_impl",
     "//xla/service:memory_space_assignment_proto_cc_impl",
     "//xla/service/gpu:backend_configs_cc_impl",
-    "//xla/service/gpu:hlo_op_profile_proto_cc_impl",
     "//xla/stream_executor:dnn_proto_cc_impl",
-    "//xla/stream_executor/host:host_platform",
     "//xla:literal",
     "//xla:shape_util",
     "//xla:status",
@@ -45,11 +44,12 @@ cc_binary(
     "//xla/pjrt:tfrt_cpu_pjrt_client",
     "//xla/pjrt:pjrt_c_api_client",
     "//xla/pjrt:tpu_client",
+    "//xla/pjrt:pjrt_plugin_device_client",
+    "//xla/pjrt:pjrt_plugin_device_client_headers",
     "//xla/pjrt/distributed",
     "//xla/pjrt/gpu:se_gpu_pjrt_client",
     "//xla/pjrt/distributed:client",
     "//xla/pjrt/distributed:service",
-    "//xla:autotuning_proto_cc_impl",
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
@@ -63,6 +63,7 @@ cc_binary(
     "@llvm-project//mlir:SparseTensorDialect",
     "@tf_runtime//:core_runtime",
     "@tf_runtime//:hostcontext",
+    "@tf_runtime//third_party/llvm_derived:unique_any",
     "@tsl//tsl/platform:errors",
     "@tsl//tsl/platform:fingerprint",
     "@tsl//tsl/platform:float8",
@@ -72,6 +73,7 @@ cc_binary(
     "@tsl//tsl/profiler/utils:time_utils_impl",
     "@tsl//tsl/profiler/backends/cpu:annotation_stack_impl",
     "@tsl//tsl/profiler/backends/cpu:traceme_recorder_impl",
+    "@tsl//tsl/protobuf:autotuning_proto_cc_impl",
     "@tsl//tsl/protobuf:protos_all_cc_impl",
     "@tsl//tsl/protobuf:dnn_proto_cc_impl",
     "@tsl//tsl/framework:allocator",
@@ -80,6 +82,9 @@ cc_binary(
   ]
   # GRPC Dependencies (needed for PjRt distributed)
   + tsl_grpc_cc_dependencies()
+  + if_with_tpu_support([
+    "@tsl//tsl/core/tpu:tpu_api_dlsym_initializer",
+  ])
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",
   ])
@@ -111,6 +116,7 @@ genrule(
   name = "xla_extension_headers",
   srcs = [
     ":xla_extension_dep_headers",
+    "//xla/mlir_hlo:hlo_ops_enums_inc_gen",
   ],
   outs = ["include"],
   cmd = """
@@ -166,17 +172,13 @@ genrule(
   """
 )
 
-# See https://github.com/bazelbuild/rules_pkg/issues/517#issuecomment-1492917994
-genrule(
+pkg_tar(
   name = "xla_extension",
-  outs = ["xla_extension.tar.gz"],
+  extension = "tar.gz",
+  mode = "0644",
+  package_dir = "xla_extension",
   srcs = [
     ":xla_extension_lib",
     ":xla_extension_headers",
   ],
-  cmd = """
-    mkdir xla_extension
-    cp -r $(SRCS) xla_extension
-    tar czf "$@" xla_extension
-  """
 )
