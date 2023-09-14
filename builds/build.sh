@@ -33,8 +33,8 @@ case "$1" in
 
   "cuda120")
     docker build -t xla-cuda120 -f builds/cuda.Dockerfile \
-      --build-arg CUDA_VERSION=12.0.0 \
-      --build-arg CUDNN_VERSION=8.8.0 \
+      --build-arg CUDA_VERSION=12.1.0 \
+      --build-arg CUDNN_VERSION=8.9.0 \
       --build-arg XLA_TARGET=cuda120 \
       .
 
