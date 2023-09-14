@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.5.1](https://github.com/elixir-nx/xla/tree/v0.5.1) (2023-09-14)
+
+### Changed
+
+* Bumped the version requirement for CUDA 12 to CUDA 12.1 and cuDNN 8.9 ([#54](https://github.com/elixir-nx/xla/pull/54))
+
 ## [v0.5.0](https://github.com/elixir-nx/xla/tree/v0.5.0) (2023-08-13)
 
 ### Added
