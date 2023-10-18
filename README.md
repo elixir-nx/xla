@@ -17,6 +17,9 @@ need to export it in every shell session.
 The default value is `cpu`, which implies the final the binary supports targeting
 only the host CPU.
 
+You can find the cuda version by running `nvcc -V`.  Do not use the cuda version
+reported by `nvidia-smi`, this is often not trustworthy.
+
 | Value | Target environment |
 | --- | --- |
 | cpu | |
