@@ -31,8 +31,9 @@ and [cuDNN](https://developer.nvidia.com/cudnn) compatible with your GPU drivers
 See [the installation instructions](https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html)
 and [the cuDNN support matrix](https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html)
 for version compatibility. To use precompiled XLA binaries specify a target matching
-your CUDA version (like `cuda118`). When building from source it's enough to specify
-`cuda` as the target.
+your CUDA version (like `cuda118`). You can find your CUDA version by running `nvcc --version`
+(note that `nvidia-smi` shows the highest supported CUDA version, not the installed one).
+When building from source it's enough to specify `cuda` as the target.
 
 Note that all the precompiled binaries assume glibc 2.31 or newer.
 
