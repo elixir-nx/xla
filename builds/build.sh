@@ -41,6 +41,14 @@ case "$1" in
     docker run --rm -v $(pwd)/builds/output/cuda120/build:/build -v $(pwd)/builds/output/cuda120/.cache:/root/.cache xla-cuda120
   ;;
 
+  "rocm")
+    docker build -t xla-rocm -f builds/rocm.Dockerfile \
+      --build-arg XLA_TARGET=rocm \
+      .
+
+    docker run --rm -v $(pwd)/builds/output/rocm/build:/build -v $(pwd)/builds/output/rocm/.cache:/root/.cache xla-rocm
+  ;;
+
   *)
     print_usage_and_exit
   ;;
