@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 print_usage_and_exit() {
   echo "Usage: $0 <variant>"
   echo ""
-  echo "Compiles the project inside docker. Available variants: cuda118, cuda120."
+  echo "Compiles the project inside docker. Available variants: cpu, cuda118, cuda120."
   exit 1
 }
 
@@ -21,6 +21,14 @@ fi
 # [1]: https://docs.nvidia.com/deeplearning/cudnn/archives/index.html
 
 case "$1" in
+  "cpu")
+    docker build -t xla-cpu -f builds/cpu.Dockerfile \
+      --build-arg XLA_TARGET=cpu \
+      .
+
+    docker run --rm -v $(pwd)/builds/output/cpu/build:/build -v $(pwd)/builds/output/cpu/.cache:/root/.cache xla-cpu
+  ;;
+
   "cuda118")
     docker build -t xla-cuda118 -f builds/cuda.Dockerfile \
       --build-arg CUDA_VERSION=11.8.0 \

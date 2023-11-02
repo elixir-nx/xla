@@ -180,36 +180,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: ${{ matrix.xla_target }}
-
-  linux_arm:
-    name: "aarch64-linux-gnu-cpu (cross-compiled)"
-    needs: [create_draft_release]
-    # We intentionally build on ubuntu 20 to compile against
-    # an older version of glibc
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: "24"
-          elixir-version: "1.12.3"
-      # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "6.1.2"
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-      - run: python -m pip install --upgrade pip numpy
-      # Build and upload the archives
-      - run: mix deps.get
-      # Hide system OpenSSL as suggested in https://github.com/tensorflow/tensorflow/issues/48401#issuecomment-818377995
-      - run: sudo mv /usr/include/openssl /usr/include/openssl.original
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: cpu
-          XLA_TARGET_PLATFORM: "aarch64-linux-gnu"
-          # Explicitly cross-compile for arm64
-          BUILD_FLAGS: "--config=elinux_aarch64"
-          CC: gcc-9
