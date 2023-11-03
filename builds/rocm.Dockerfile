@@ -45,7 +45,6 @@ RUN cp -r /usr/ELIXIR_LOCAL/lib/* /usr/local/lib && \
 
 # ---
 
-ENV TF_ROCM_AMDGPU_TARGETS "gfx900,gfx906,gfx908,gfx90a,gfx1030"
 ENV ROCM_PATH "/opt/rocm-5.7.0"
 
 # ---
