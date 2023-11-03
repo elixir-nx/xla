@@ -45,14 +45,6 @@ RUN cp -r /usr/ELIXIR_LOCAL/lib/* /usr/local/lib && \
 
 # ---
 
-# This flag disables JIT behaviour that causes a segfault under QEMU.
-# Note that we set this runtime flag only during the build stage and
-# it has no impact when running the final image. See [1] for more
-# information.
-#
-# [1]: https://github.com/erlang/otp/pull/6340
-ENV ERL_FLAGS="+JMsingle true"
-
 ENV TF_ROCM_AMDGPU_TARGETS "gfx900,gfx906,gfx908,gfx90a,gfx1030"
 ENV TF_ROCM_VERSION 50700
 ENV ROCM_PATH=/opt/rocm-5.7.0

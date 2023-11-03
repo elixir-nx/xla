@@ -16,9 +16,11 @@ cc_binary(
     "//xla:xla_data_proto_cc_impl",
     "//xla/service:hlo_proto_cc_impl",
     "//xla/service/memory_space_assignment:memory_space_assignment_proto_cc_impl",
+    "//xla/service:buffer_assignment_proto_cc_impl",
     "//xla/service/gpu:backend_configs_cc_impl",
     "//xla/service/gpu/model:hlo_op_profile_proto_cc_impl",
     "//xla/stream_executor:device_description_proto_cc_impl",
+    "//xla:autotune_results_proto_cc_impl",
     "//xla/stream_executor:stream_executor_impl",
     "//xla/stream_executor/gpu:gpu_init_impl",
     "//xla/stream_executor/host:host_platform",
@@ -63,8 +65,6 @@ cc_binary(
     "@llvm-project//mlir:Pass",
     "@llvm-project//mlir:ReconcileUnrealizedCasts",
     "@llvm-project//mlir:SparseTensorDialect",
-    "@tf_runtime//:core_runtime",
-    "@tf_runtime//:hostcontext",
     "@tsl//tsl/platform:errors",
     "@tsl//tsl/platform:fingerprint",
     "@tsl//tsl/platform:float8",
@@ -146,6 +146,9 @@ genrule(
       d="$${d/include\\/grpc/grpc}"
       # Remap tfrt paths
       d="$${d/include\\/tfrt/tfrt}"
+      # Remap ml_dtypes paths
+      d="$${d/_virtual_includes\\/int4\\/ml_dtypes/ml_dtypes}"
+      d="$${d/_virtual_includes\\/float8\\/ml_dtypes/ml_dtypes}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done
