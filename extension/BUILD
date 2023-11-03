@@ -1,9 +1,11 @@
 load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
+load("@tsl//tsl:tsl.bzl", "if_with_tpu_support")
 load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
 load("@tsl//tsl:tsl.bzl", "transitive_hdrs",)
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 package(default_visibility=["//visibility:private"])
 
@@ -48,7 +50,6 @@ cc_binary(
     "//xla/pjrt:pjrt_compiler",
     "//xla/pjrt:tfrt_cpu_pjrt_client",
     "//xla/pjrt:pjrt_c_api_client",
-    # "//xla/pjrt:tpu_client",
     "//xla/pjrt/distributed",
     "//xla/pjrt/gpu:se_gpu_pjrt_client",
     "//xla/pjrt/distributed:client",
@@ -158,16 +159,40 @@ genrule(
     """,
   )
 
+genrule(
+  name = "libtpu.whl",
+  outs = ["libtpu.whl"],
+  cmd = """
+    libtpu_version="0.1.dev20231102"
+    libtpu_storage_path="https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/wheels/libtpu-nightly/libtpu_nightly-$${libtpu_version}-py3-none-any.whl"
+    wget -O "$@" "$$libtpu_storage_path"
+  """
+)
+
+genrule(
+  name = "libtpu.so",
+  srcs = [
+    ":libtpu.whl"
+  ],
+  outs = ["libtpu.so"],
+  cmd = """
+    unzip -p "$(SRCS)" libtpu/libtpu.so > "$@"
+  """
+)
+
 # This genrule remaps libxla_extension.so to lib/libxla_extension.so
 genrule(
   name = "xla_extension_lib",
   srcs = [
     ":libxla_extension.so",
-  ],
+  ]
+  + if_with_tpu_support([
+    ":libtpu.so"
+  ]),
   outs = ["lib"],
   cmd = """
     mkdir $@
-    mv $(location :libxla_extension.so) $@
+    mv $(SRCS) $@
   """
 )
 
