@@ -156,7 +156,7 @@ You can use the following env vars to customize your build:
 ## Runtime flags
 
 You can further configure XLA runtime options with `XLA_FLAGS`,
-see: [tensorflow/compiler/xla/debug_options_flags.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/compiler/xla/debug_options_flags.cc)
+see: [xla/debug_options_flags.cc](https://github.com/openxla/xla/blob/main/xla/debug_options_flags.cc)
 for the list of available flags.
 
 ## Release process
