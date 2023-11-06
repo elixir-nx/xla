@@ -29,6 +29,14 @@ case "$1" in
     docker run --rm -v $(pwd)/builds/output/cpu/build:/build -v $(pwd)/builds/output/cpu/.cache:/root/.cache xla-cpu
   ;;
 
+  "tpu")
+    docker build -t xla-tpu -f builds/cpu.Dockerfile \
+      --build-arg XLA_TARGET=tpu \
+      .
+
+    docker run --rm -v $(pwd)/builds/output/tpu/build:/build -v $(pwd)/builds/output/tpu/.cache:/root/.cache xla-tpu
+  ;;
+
   "cuda118")
     docker build -t xla-cuda118 -f builds/cuda.Dockerfile \
       --build-arg CUDA_VERSION=11.8.0 \
