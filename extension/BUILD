@@ -93,7 +93,14 @@ cc_binary(
     "//xla/stream_executor:rocm_platform"
   ]),
   copts = ["-fvisibility=default"],
-  linkopts = ["-shared"],
+  linkopts= select({
+    "@tsl//tsl:macos": [
+        "-Wl,-install_name,@rpath/libxla_extension.so",
+    ],
+    "//conditions:default": [
+        "-Wl,-soname,libxla_extension.so",
+    ],
+  }),
   features = ["-use_header_modules"],
   linkshared = 1,
 )
