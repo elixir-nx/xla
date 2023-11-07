@@ -96,9 +96,13 @@ cc_binary(
   linkopts= select({
     "@tsl//tsl:macos": [
         "-Wl,-install_name,@rpath/libxla_extension.so",
+        # We set RPATH to the same dir as libxla_extension.so, so that
+        # loading PjRt plugins in the same directory works out of the box
+        "-Wl,-rpath,@loader_path/",
     ],
     "//conditions:default": [
         "-Wl,-soname,libxla_extension.so",
+        "-Wl,-rpath='$$ORIGIN'",
     ],
   }),
   features = ["-use_header_modules"],
