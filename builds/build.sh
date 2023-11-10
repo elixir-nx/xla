@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 print_usage_and_exit() {
   echo "Usage: $0 <variant>"
   echo ""
-  echo "Compiles the project inside docker. Available variants: cpu, cuda118, cuda120."
+  echo "Compiles the project inside docker. Available variants: cpu, cuda118, cuda120, tpu, rocm."
   exit 1
 }
 
@@ -26,7 +26,23 @@ case "$1" in
       --build-arg XLA_TARGET=cpu \
       .
 
-    docker run --rm -v $(pwd)/builds/output/cpu/build:/build -v $(pwd)/builds/output/cpu/.cache:/root/.cache xla-cpu
+    docker run --rm \
+      -v $(pwd)/builds/output/cpu/build:/build \
+      -v $(pwd)/builds/output/cpu/.cache:/root/.cache \
+      $XLA_DOCKER_FLAGS \
+      xla-cpu
+  ;;
+
+  "tpu")
+    docker build -t xla-tpu -f builds/cpu.Dockerfile \
+      --build-arg XLA_TARGET=tpu \
+      .
+
+    docker run --rm \
+      -v $(pwd)/builds/output/tpu/build:/build \
+      -v $(pwd)/builds/output/tpu/.cache:/root/.cache \
+      $XLA_DOCKER_FLAGS \
+      xla-tpu
   ;;
 
   "cuda118")
@@ -36,7 +52,11 @@ case "$1" in
       --build-arg XLA_TARGET=cuda118 \
       .
 
-    docker run --rm -v $(pwd)/builds/output/cuda118/build:/build -v $(pwd)/builds/output/cuda118/.cache:/root/.cache xla-cuda118
+    docker run --rm \
+      -v $(pwd)/builds/output/cuda118/build:/build \
+      -v $(pwd)/builds/output/cuda118/.cache:/root/.cache \
+      $XLA_DOCKER_FLAGS \
+      xla-cuda118
   ;;
 
   "cuda120")
@@ -46,7 +66,23 @@ case "$1" in
       --build-arg XLA_TARGET=cuda120 \
       .
 
-    docker run --rm -v $(pwd)/builds/output/cuda120/build:/build -v $(pwd)/builds/output/cuda120/.cache:/root/.cache xla-cuda120
+    docker run --rm \
+      -v $(pwd)/builds/output/cuda120/build:/build \
+      -v $(pwd)/builds/output/cuda120/.cache:/root/.cache \
+      $XLA_DOCKER_FLAGS \
+      xla-cuda120
+  ;;
+
+  "rocm")
+    docker build -t xla-rocm -f builds/rocm.Dockerfile \
+      --build-arg XLA_TARGET=rocm \
+      .
+
+    docker run --rm \
+      -v $(pwd)/builds/output/rocm/build:/build \
+      -v $(pwd)/builds/output/rocm/.cache:/root/.cache \
+      $XLA_DOCKER_FLAGS \
+      xla-rocm
   ;;
 
   *)

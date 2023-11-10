@@ -43,6 +43,14 @@ For GPU support, we primarily rely on CUDA, because of the popularity and availa
 in the cloud. In case you use ROCm and it does not work, please open up an issue and
 we will be happy to help.
 
+In addition to building in a local environment, you can build the ROCm binary using
+the Docker-based scripts in [`builds/`](./builds/). You may want to adjust the ROCm
+version in `rocm.Dockerfile` accordingly.
+
+When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-5.7.0`
+and `LD_LIBRARY_PATH="/opt/rocm-5.7.0/lib"` (with your respective version). For further
+issues, feel free to open an issue.
+
 #### `XLA_BUILD`
 
 Defaults to `false`. If `true` the binary is built locally, which may be intended

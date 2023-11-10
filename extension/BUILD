@@ -1,24 +1,29 @@
 load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
+load("@tsl//tsl:tsl.bzl", "if_with_tpu_support")
 load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
 load("@tsl//tsl:tsl.bzl", "transitive_hdrs",)
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 package(default_visibility=["//visibility:private"])
 
-# Static library which contains dependencies necessary for building on
-# top of XLA
+# Shared library which contains the subset of XLA required for EXLA
 cc_binary(
   name = "libxla_extension.so",
   deps = [
     "//xla:xla_proto_cc_impl",
     "//xla:xla_data_proto_cc_impl",
     "//xla/service:hlo_proto_cc_impl",
-    "//xla/service:memory_space_assignment_proto_cc_impl",
+    "//xla/service/memory_space_assignment:memory_space_assignment_proto_cc_impl",
+    "//xla/service:buffer_assignment_proto_cc_impl",
     "//xla/service/gpu:backend_configs_cc_impl",
-    "//xla/service/gpu:hlo_op_profile_proto_cc_impl",
-    "//xla/stream_executor:dnn_proto_cc_impl",
+    "//xla/service/gpu/model:hlo_op_profile_proto_cc_impl",
+    "//xla/stream_executor:device_description_proto_cc_impl",
+    "//xla:autotune_results_proto_cc_impl",
+    "//xla/stream_executor:stream_executor_impl",
+    "//xla/stream_executor/gpu:gpu_init_impl",
     "//xla/stream_executor/host:host_platform",
     "//xla:literal",
     "//xla:shape_util",
@@ -44,7 +49,6 @@ cc_binary(
     "//xla/pjrt:pjrt_compiler",
     "//xla/pjrt:tfrt_cpu_pjrt_client",
     "//xla/pjrt:pjrt_c_api_client",
-    "//xla/pjrt:tpu_client",
     "//xla/pjrt/distributed",
     "//xla/pjrt/gpu:se_gpu_pjrt_client",
     "//xla/pjrt/distributed:client",
@@ -61,8 +65,6 @@ cc_binary(
     "@llvm-project//mlir:Pass",
     "@llvm-project//mlir:ReconcileUnrealizedCasts",
     "@llvm-project//mlir:SparseTensorDialect",
-    "@tf_runtime//:core_runtime",
-    "@tf_runtime//:hostcontext",
     "@tsl//tsl/platform:errors",
     "@tsl//tsl/platform:fingerprint",
     "@tsl//tsl/platform:float8",
@@ -90,7 +92,21 @@ cc_binary(
     "//xla/stream_executor:rocm_platform"
   ]),
   copts = ["-fvisibility=default"],
-  linkopts = ["-shared"],
+  linkopts= select({
+    "@tsl//tsl:macos": [
+        # We set the install_name, such that the library is looked up
+        # in the RPATH at runtime, otherwise the install_name is an
+        # arbitrary path within bazel workspace
+        "-Wl,-install_name,@rpath/libxla_extension.so",
+        # We set RPATH to the same dir as libxla_extension.so, so that
+        # loading PjRt plugins in the same directory works out of the box
+        "-Wl,-rpath,@loader_path/",
+    ],
+    "//conditions:default": [
+        "-Wl,-soname,libxla_extension.so",
+        "-Wl,-rpath='$$ORIGIN'",
+    ],
+  }),
   features = ["-use_header_modules"],
   linkshared = 1,
 )
@@ -144,6 +160,9 @@ genrule(
       d="$${d/include\\/grpc/grpc}"
       # Remap tfrt paths
       d="$${d/include\\/tfrt/tfrt}"
+      # Remap ml_dtypes paths
+      d="$${d/_virtual_includes\\/int4\\/ml_dtypes/ml_dtypes}"
+      d="$${d/_virtual_includes\\/float8\\/ml_dtypes/ml_dtypes}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"
     done
@@ -153,16 +172,40 @@ genrule(
     """,
   )
 
+genrule(
+  name = "libtpu_whl",
+  outs = ["libtpu.whl"],
+  cmd = """
+    libtpu_version="0.1.dev20231102"
+    libtpu_storage_path="https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/wheels/libtpu-nightly/libtpu_nightly-$${libtpu_version}-py3-none-any.whl"
+    wget -O "$@" "$$libtpu_storage_path"
+  """
+)
+
+genrule(
+  name = "libtpu_so",
+  srcs = [
+    ":libtpu_whl"
+  ],
+  outs = ["libtpu.so"],
+  cmd = """
+    unzip -p "$(SRCS)" libtpu/libtpu.so > "$@"
+  """
+)
+
 # This genrule remaps libxla_extension.so to lib/libxla_extension.so
 genrule(
   name = "xla_extension_lib",
   srcs = [
     ":libxla_extension.so",
-  ],
+  ]
+  + if_with_tpu_support([
+    ":libtpu_so"
+  ]),
   outs = ["lib"],
   cmd = """
     mkdir $@
-    mv $(location :libxla_extension.so) $@
+    mv $(SRCS) $@
   """
 )
 
