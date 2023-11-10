@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-* Bumped XLA version ([#62]((https://github.com/elixir-nx/xla/pull/62)))
+* Bumped XLA version ([#62](https://github.com/elixir-nx/xla/pull/62))
 
 ## [v0.5.1](https://github.com/elixir-nx/xla/tree/v0.5.1) (2023-09-14)
 
