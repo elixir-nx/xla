@@ -44,7 +44,7 @@ in the cloud. In case you use ROCm and it does not work, please open up an issue
 we will be happy to help.
 
 In addition to building in a local environment, you can build the ROCm binary using
-the Docker-based scripts in [`builds/`](./builds/). You may want to adjust the ROCm
+the Docker-based scripts in [`builds/`](https://github.com/elixir-nx/xla/tree/main/builds). You may want to adjust the ROCm
 version in `rocm.Dockerfile` accordingly.
 
 When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-5.7.0`
