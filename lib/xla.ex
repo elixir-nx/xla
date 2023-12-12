@@ -233,7 +233,7 @@ defmodule XLA do
     with {:ok, body} <- get(url) do
       # We don't have a JSON library available here, so we do
       # a simple matching
-      {:ok, Regex.scan(~r/"name":\s+"(.*\.tar\.gz)"/, body) |> Enum.map(&Enum.at(&1, 1))}
+      {:ok, Regex.scan(~r/"name":\s+"(.*\.tar\.gz)"/, body, capture: :all_but_first) |> List.flatten()}
     end
   end
 
