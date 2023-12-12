@@ -244,8 +244,8 @@ defmodule XLA do
   defp download(url, dest) do
     command =
       case network_tool() do
-        :curl -> "curl --fail -L -o #{dest} #{curl_options()} #{url}"
-        :wget -> "wget -O #{dest} #{wget_options()} #{url}"
+        :curl -> "curl --fail --location --output #{dest} #{curl_options()} #{url}"
+        :wget -> "wget --output-document=#{dest} #{wget_options()} #{url}"
       end
 
     case System.shell(command) do
@@ -257,8 +257,8 @@ defmodule XLA do
   defp get(url) do
     command =
       case network_tool() do
-        :curl -> "curl --fail --silent -L #{curl_options()} #{url}"
-        :wget -> "wget -q -O - #{wget_options()} #{url}"
+        :curl -> "curl --fail --silent --location #{curl_options()} #{url}"
+        :wget -> "wget --quiet --output-document=- #{wget_options()} #{url}"
       end
 
     case System.shell(command) do
@@ -289,7 +289,7 @@ defmodule XLA do
 
   defp curl_options() do
     headers = http_headers()
-    Enum.map_join(headers, " ", &"-H '#{&1}'")
+    Enum.map_join(headers, " ", &"--header '#{&1}'")
   end
 
   defp wget_options() do
