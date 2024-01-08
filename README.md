@@ -82,6 +82,9 @@ should be a list following this format: `Key1: Value1; Key2: value2`.
 
 ## Building from source
 
+> Note: currently only macOS and Linux is supported. When on Windows, the best option
+> to use XLA and EXLA is by running inside WSL.
+
 To build the XLA binaries locally you need to set `XLA_BUILD=true` and possibly `XLA_TARGET`.
 Keep in mind that the compilation usually takes a very long time.
 
@@ -90,12 +93,6 @@ You will need the following installed in your system for the compilation:
   * [Git](https://git-scm.com/) for fetching XLA source
   * [Bazel v6.1.2](https://bazel.build/) for compiling XLA
   * [Python3](https://python.org) with NumPy installed for compiling XLA
-
-If running on Windows, you will also need:
-
-  * [MSYS2](https://www.msys2.org/)
-  * [Microsoft Build Tools 2019](https://visualstudio.microsoft.com/downloads/)
-  * [Microsoft Visual C++ 2019 Redistributable](https://visualstudio.microsoft.com/downloads/)
 
 ### Common issues
 
