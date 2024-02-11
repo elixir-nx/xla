@@ -2,6 +2,9 @@
 
 Precompiled [XLA](https://github.com/openxla/xla) binaries for [EXLA](https://github.com/elixir-nx/nx/tree/main/exla).
 
+Currently supports UNIX systems, including macOS (although no built-in support for Apple Metal).
+Windows platforms are only supported upstream via [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux).
+
 ## Usage
 
 EXLA already depends on this package, so you generally don't need to install it yourself.
