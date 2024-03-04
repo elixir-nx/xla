@@ -149,6 +149,7 @@ defmodule XLA do
         ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", nil}
         [arch, _vendor, "darwin" <> _ | _] -> {arch, "darwin", nil}
         [arch, _vendor, os, abi] -> {arch, os, abi}
+        [arch, _vendor, os] -> {arch, os, nil}
         ["win32"] -> {"x86_64", "windows", nil}
       end
     end
@@ -233,7 +234,8 @@ defmodule XLA do
     with {:ok, body} <- get(url) do
       # We don't have a JSON library available here, so we do
       # a simple matching
-      {:ok, Regex.scan(~r/"name":\s+"(.*\.tar\.gz)"/, body, capture: :all_but_first) |> List.flatten()}
+      {:ok,
+       Regex.scan(~r/"name":\s+"(.*\.tar\.gz)"/, body, capture: :all_but_first) |> List.flatten()}
     end
   end
 
