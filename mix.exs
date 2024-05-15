@@ -34,7 +34,7 @@ defmodule XLA.MixProject do
       links: %{
         "GitHub" => "https://github.com/elixir-nx/xla"
       },
-      files: ~w(extension lib Makefile Makefile.win mix.exs README.md LICENSE CHANGELOG.md)
+      files: ~w(extension lib Makefile mix.exs README.md LICENSE CHANGELOG.md)
     ]
   end
 

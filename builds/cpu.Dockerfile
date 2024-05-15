@@ -37,7 +37,7 @@ COPY mix.exs mix.lock ./
 RUN mix deps.get
 
 COPY lib lib
-COPY Makefile Makefile.win ./
+COPY Makefile ./
 COPY extension extension
 
 CMD [ "mix", "compile" ]
