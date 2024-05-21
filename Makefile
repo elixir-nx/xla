@@ -33,11 +33,13 @@ $(BUILD_ARCHIVE): $(OPENXLA_DIR) extension/BUILD
 # Clones OPENXLA
 $(OPENXLA_DIR):
 	mkdir -p $(OPENXLA_DIR) && \
+	  cp -r extension/patches $(OPENXLA_DIR) && \
 		cd $(OPENXLA_DIR) && \
 		git init && \
 		git remote add origin $(OPENXLA_GIT_REPO) && \
 		git fetch --depth 1 origin $(OPENXLA_GIT_REV) && \
 		git checkout FETCH_HEAD && \
+		bash patches/apply.sh && \
 		rm $(OPENXLA_DIR)/.bazelversion
 
 # Print OPENXLA Dir
