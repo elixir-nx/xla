@@ -1,0 +1,12 @@
+diff --git a/third_party/tsl/third_party/absl/workspace.bzl b/third_party/tsl/third_party/absl/workspace.bzl
+index 06f75166ce4b..56d146d65abe 100644
+--- a/third_party/tsl/third_party/absl/workspace.bzl
++++ b/third_party/tsl/third_party/absl/workspace.bzl
+@@ -42,6 +42,7 @@ def repo():
+         build_file = "//third_party/absl:com_google_absl.BUILD",
+         system_build_file = "//third_party/absl:system.BUILD",
+         system_link_files = SYS_LINKS,
++       patch_file = ["//third_party/absl:absl_neon.patch"],
+         strip_prefix = "abseil-cpp-{commit}".format(commit = ABSL_COMMIT),
+         urls = tf_mirror_urls("https://github.com/abseil/abseil-cpp/archive/{commit}.tar.gz".format(commit = ABSL_COMMIT)),
+     )
