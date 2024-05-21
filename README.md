@@ -94,21 +94,21 @@ Keep in mind that the compilation usually takes a very long time.
 You will need the following installed in your system for the compilation:
 
   * [Git](https://git-scm.com/) for fetching XLA source
-  * [Bazel v6.1.2](https://bazel.build/) for compiling XLA
+  * [Bazel v6.5.0](https://bazel.build/) for compiling XLA
   * [Python3](https://python.org) with NumPy installed for compiling XLA
 
 ### Common issues
 
 #### Bazel version
 
-Use `bazel --version` to check your Bazel version, make sure you are using v6.1.2.
+Use `bazel --version` to check your Bazel version, make sure you are using v6.5.0.
 Most binaries are available on [Github](https://github.com/bazelbuild/bazel/releases),
 but it can also be installed with `asdf`:
 
 ```shell
 asdf plugin-add bazel
-asdf install bazel 6.1.2
-asdf global bazel 6.1.2
+asdf install bazel 6.5.0
+asdf global bazel 6.5.0
 ```
 
 #### GCC
