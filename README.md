@@ -24,8 +24,7 @@ only the host CPU.
 | --- | --- |
 | cpu | |
 | tpu | libtpu |
-| cuda120 | CUDA 12.1+, cuDNN 8.9+ |
-| cuda118 | CUDA 11.8+, cuDNN 8.6+ |
+| cuda12 | CUDA 12.1+, cuDNN 8.9+ |
 | cuda | CUDA x.y, cuDNN (building from source only) |
 | rocm | ROCm (building from source only) |
 
@@ -34,7 +33,7 @@ and [cuDNN](https://developer.nvidia.com/cudnn) compatible with your GPU drivers
 See [the installation instructions](https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html)
 and [the cuDNN support matrix](https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html)
 for version compatibility. To use precompiled XLA binaries specify a target matching
-your CUDA version (like `cuda118`). You can find your CUDA version by running `nvcc --version`
+your CUDA version (like `cuda12`). You can find your CUDA version by running `nvcc --version`
 (note that `nvidia-smi` shows the highest supported CUDA version, not the installed one).
 When building from source it's enough to specify `cuda` as the target.
 

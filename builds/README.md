@@ -7,14 +7,14 @@ This directory contains Docker-based automated builds to run off-CI.
 Run the build script, passing one of the defined variants.
 
 ```shell
-./build.sh cuda118
+./build.sh cuda12
 ```
 
 When running on a remote server, it's important to detach the process,
 so that it keeps running if the ssh connection is closed:
 
 ```shell
-nohup time builds/build.sh cuda118 > build.log 2>&1 &
+nohup time builds/build.sh cuda12 > build.log 2>&1 &
 tail -f build.log
 ```
 

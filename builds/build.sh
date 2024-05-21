@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 print_usage_and_exit() {
   echo "Usage: $0 <variant>"
   echo ""
-  echo "Compiles the project inside docker. Available variants: cpu, cuda118, cuda120, tpu, rocm."
+  echo "Compiles the project inside docker. Available variants: cpu, cuda12, tpu, rocm."
   exit 1
 }
 
@@ -45,32 +45,18 @@ case "$1" in
       xla-tpu
   ;;
 
-  "cuda118")
-    docker build -t xla-cuda118 -f builds/cuda.Dockerfile \
-      --build-arg CUDA_VERSION=11.8.0 \
-      --build-arg CUDNN_VERSION=8.6.0 \
-      --build-arg XLA_TARGET=cuda118 \
-      .
-
-    docker run --rm \
-      -v $(pwd)/builds/output/cuda118/build:/build \
-      -v $(pwd)/builds/output/cuda118/.cache:/root/.cache \
-      $XLA_DOCKER_FLAGS \
-      xla-cuda118
-  ;;
-
-  "cuda120")
-    docker build -t xla-cuda120 -f builds/cuda.Dockerfile \
+  "cuda12")
+    docker build -t xla-cuda12 -f builds/cuda.Dockerfile \
       --build-arg CUDA_VERSION=12.1.0 \
       --build-arg CUDNN_VERSION=8.9.0 \
-      --build-arg XLA_TARGET=cuda120 \
+      --build-arg XLA_TARGET=cuda12 \
       .
 
     docker run --rm \
-      -v $(pwd)/builds/output/cuda120/build:/build \
-      -v $(pwd)/builds/output/cuda120/.cache:/root/.cache \
+      -v $(pwd)/builds/output/cuda12/build:/build \
+      -v $(pwd)/builds/output/cuda12/.cache:/root/.cache \
       $XLA_DOCKER_FLAGS \
-      xla-cuda120
+      xla-cuda12
   ;;
 
   "rocm")
