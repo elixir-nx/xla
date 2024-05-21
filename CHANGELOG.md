@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased](https://github.com/elixir-nx/xla/tree/main)
+
+### Changed
+
+* Bumped XLA version ([#83](https://github.com/elixir-nx/xla/pull/83))
+* Renamed the recognised XLA_TARGET "cuda120" to "cuda12" ([#84](https://github.com/elixir-nx/xla/pull/84))
+
+### Removed
+
+* Dropped support for CUDA 11.8+, now 12.1+ is required ([#84](https://github.com/elixir-nx/xla/pull/84))
+
 ## [v0.6.0](https://github.com/elixir-nx/xla/tree/v0.6.0) (2023-11-10)
 
 ### Changed
