@@ -1,9 +1,9 @@
 load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
-load("@tsl//tsl:tsl.bzl", "if_with_tpu_support")
-load("@tsl//tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
-load("@tsl//tsl:tsl.bzl", "transitive_hdrs",)
+load("//xla/tsl:tsl.bzl", "if_with_tpu_support")
+load("//xla/tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
+load("//xla/tsl:tsl.bzl", "transitive_hdrs",)
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
@@ -15,13 +15,14 @@ cc_binary(
   deps = [
     "//xla:xla_proto_cc_impl",
     "//xla:xla_data_proto_cc_impl",
+    "//xla:autotune_results_proto_cc_impl",
+    "//xla:autotuning_proto_cc_impl",
     "//xla/service:hlo_proto_cc_impl",
     "//xla/service/memory_space_assignment:memory_space_assignment_proto_cc_impl",
     "//xla/service:buffer_assignment_proto_cc_impl",
     "//xla/service/gpu:backend_configs_cc_impl",
     "//xla/service/gpu/model:hlo_op_profile_proto_cc_impl",
     "//xla/stream_executor:device_description_proto_cc_impl",
-    "//xla:autotune_results_proto_cc_impl",
     "//xla/stream_executor:stream_executor_impl",
     "//xla/stream_executor/gpu:gpu_init_impl",
     "//xla/stream_executor/host:host_platform",
@@ -31,19 +32,18 @@ cc_binary(
     "//xla:statusor",
     "//xla:types",
     "//xla:util",
-    "//xla/client:xla_computation",
     "//xla/mlir/utils:error_util",
     "//xla/mlir_hlo",
     "//xla/mlir_hlo:all_passes",
     "//xla/pjrt:mlir_to_hlo",
+    "//xla/translate/hlo_to_mhlo:hlo_to_mlir_hlo",
+    "//xla/client:xla_computation",
     "//xla/client/lib:lu_decomposition",
     "//xla/client/lib:math",
     "//xla/client/lib:qr",
     "//xla/client/lib:svd",
     "//xla/client/lib:self_adjoint_eig",
     "//xla/client/lib:sorting",
-    "//xla/mlir_hlo:mhlo_passes",
-    "//xla/translate/hlo_to_mhlo:hlo_to_mlir_hlo",
     "//xla/pjrt:interpreter_device",
     "//xla/pjrt:pjrt_client",
     "//xla/pjrt:pjrt_compiler",
@@ -53,7 +53,6 @@ cc_binary(
     "//xla/pjrt/gpu:se_gpu_pjrt_client",
     "//xla/pjrt/distributed:client",
     "//xla/pjrt/distributed:service",
-    "//xla:autotuning_proto_cc_impl",
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
@@ -67,7 +66,7 @@ cc_binary(
     "@llvm-project//mlir:SparseTensorDialect",
     "@tsl//tsl/platform:errors",
     "@tsl//tsl/platform:fingerprint",
-    "@tsl//tsl/platform:float8",
+    "@tsl//tsl/platform:ml_dtypes",
     "@tsl//tsl/platform:statusor",
     "@tsl//tsl/platform:env_impl",
     "@tsl//tsl/platform:tensor_float_32_utils",
@@ -78,7 +77,7 @@ cc_binary(
     "@tsl//tsl/protobuf:dnn_proto_cc_impl",
     "@tsl//tsl/framework:allocator",
     "@tsl//tsl/framework:allocator_registry_impl",
-    "@tsl//tsl/util:determinism",
+    "//xla/tsl/util:determinism",
   ]
   # GRPC Dependencies (needed for PjRt distributed)
   + tsl_grpc_cc_dependencies()
@@ -93,7 +92,7 @@ cc_binary(
   ]),
   copts = ["-fvisibility=default"],
   linkopts= select({
-    "@tsl//tsl:macos": [
+    "//xla/tsl:macos": [
         # We set the install_name, such that the library is looked up
         # in the RPATH at runtime, otherwise the install_name is an
         # arbitrary path within bazel workspace
@@ -161,7 +160,7 @@ genrule(
       # Remap tfrt paths
       d="$${d/include\\/tfrt/tfrt}"
       # Remap ml_dtypes paths
-      d="$${d/_virtual_includes\\/int4\\/ml_dtypes/ml_dtypes}"
+      d="$${d/_virtual_includes\\/intn\\/ml_dtypes/ml_dtypes}"
       d="$${d/_virtual_includes\\/float8\\/ml_dtypes/ml_dtypes}"
       mkdir -p "$@/$${d}"
       cp "$${f}" "$@/$${d}/"

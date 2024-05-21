@@ -71,16 +71,16 @@ defmodule XLA do
       case xla_target() do
         "cuda" <> _ ->
           [
-            # See https://github.com/google/jax/blob/c9cf6b44239e373cba384936dcfeff60e39ad560/.bazelrc#L68
-            ~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_52,sm_60,sm_70,compute_80"/
+            # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
+            ~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/
           ]
 
         "rocm" <> _ ->
           [
             "--config=rocm",
             "--action_env=HIP_PLATFORM=hcc",
-            # See https://github.com/google/jax/blob/c9cf6b44239e373cba384936dcfeff60e39ad560/.bazelrc#L80
-            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx1030"/
+            # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L128
+            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx1030,gfx1100"/
           ]
 
         "tpu" <> _ ->
