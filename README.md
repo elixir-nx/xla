@@ -17,8 +17,8 @@ need to export it in every shell session.
 
 #### `XLA_TARGET`
 
-The default value is `cpu`, which implies the final the binary supports targeting
-only the host CPU.
+The default value is usually `cpu`, which implies the final the binary supports targeting
+only the host CPU. If a matching CUDA version is detected, the target is set to CUDA accordingly.
 
 | Value | Target environment |
 | --- | --- |
