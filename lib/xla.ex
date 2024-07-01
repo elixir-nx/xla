@@ -44,7 +44,7 @@ defmodule XLA do
   end
 
   defp xla_target() do
-    target = System.get_env("XLA_TARGET", "cpu")
+    target = System.get_env("XLA_TARGET") || infer_xla_target() || "cpu"
 
     supported_xla_targets = ["cpu", "cuda", "rocm", "tpu", "cuda12"]
 
@@ -54,6 +54,15 @@ defmodule XLA do
     end
 
     target
+  end
+
+  defp infer_xla_target() do
+    with nvcc when nvcc != nil <- System.find_executable("nvcc"),
+         {output, 0} <- System.cmd(nvcc, ["--version"]) do
+      if output =~ "release 12.", do: "cuda12"
+    else
+      _ -> nil
+    end
   end
 
   defp xla_cache_dir() do
