@@ -57,9 +57,11 @@ defmodule XLA do
   end
 
   defp infer_xla_target() do
-    if nvcc = System.find_executable("nvcc") do
-      {output, 0} = System.cmd(nvcc, ["--version"])
+    with nvcc when nvcc != nil <- System.find_executable("nvcc"),
+         {output, 0} <- System.cmd(nvcc, ["--version"]) do
       if output =~ "release 12.", do: "cuda12"
+    else
+      _ -> nil
     end
   end
 
