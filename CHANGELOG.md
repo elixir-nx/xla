@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.7.1](https://github.com/elixir-nx/xla/tree/v0.7.1) (2024-07-01)
+
+### Changed
+
+* `XLA_TARGET` to default to a matching target when CUDA installation is detected ([#88](https://github.com/elixir-nx/xla/pull/88))
+
 ## [v0.7.0](https://github.com/elixir-nx/xla/tree/v0.7.0) (2024-05-21)
 
 ### Changed
