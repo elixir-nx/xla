@@ -202,7 +202,14 @@ defmodule XLA do
           filenames
 
         :error ->
-          raise "could not find #{release_tag()} release under https://github.com/#{@github_repo}/releases"
+          raise """
+          could not fetch #{release_tag()} release at https://github.com/#{@github_repo}/releases
+
+          This may happen if GitHub is rate-limiting your downloads. You can increase your rate \
+          limit by setting the XLA_HTTP_HEADERS environment variable with your GitHub credentials:
+
+              XLA_HTTP_HEADERS="Authorization: Bearer ${GITHUB_TOKEN}"
+          """
       end
 
     unless expected_filename in filenames do
