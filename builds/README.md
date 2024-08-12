@@ -4,7 +4,7 @@ This directory contains Docker-based automated builds to run off-CI.
 
 ## Usage
 
-Run the build script, passing one of the defined variants.
+Run the build script, passing one of the defined targets.
 
 ```shell
 ./build.sh cuda12
