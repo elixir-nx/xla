@@ -186,7 +186,7 @@ defmodule XLA do
   end
 
   defp download_external!(url, archive_path) do
-    assert_network_tool!()
+    unless local_archive(url), do: assert_network_tool!()
     Logger.info("Downloading XLA archive from #{url}")
     download_archive!(url, archive_path)
   end
@@ -260,6 +260,14 @@ defmodule XLA do
   end
 
   defp download(url, dest) do
+    if local_path = local_archive(url) do
+      File.cp!(local_path, dest)
+    else
+      download_remote(url, dest)
+    end
+  end
+
+  defp download_remote(url, dest) do
     command =
       case network_tool() do
         :curl -> "curl --fail --location --output #{dest} #{curl_options()} #{url}"
@@ -314,4 +322,15 @@ defmodule XLA do
     headers = http_headers()
     Enum.map_join(headers, " ", &"--header='#{&1}'")
   end
+
+  defp local_archive("file:" <> rest) do
+    case rest do
+      "//localhost/" <> path -> "/" <> path
+      "///" <> path -> "/" <> path
+      "/" <> path when binary_part(path, 0, 1) != "/" -> rest
+      _ -> nil
+    end
+  end
+
+  defp local_archive(_), do: nil
 end
