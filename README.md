@@ -37,7 +37,7 @@ your CUDA version (like `cuda12`). You can find your CUDA version by running `nv
 (note that `nvidia-smi` shows the highest supported CUDA version, not the installed one).
 When building from source it's enough to specify `cuda` as the target.
 
-Note that all the precompiled binaries assume glibc 2.31 or newer.
+Note that all precompiled Linux binaries assume glibc 2.31 or newer.
 
 ##### Notes for ROCm
 

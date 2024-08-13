@@ -31,7 +31,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "24"
-          elixir-version: "1.12.3"
+          elixir-version: "1.15.8"
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:

@@ -1,5 +1,5 @@
 ARG VARIANT
-ARG BASE_IMAGE="hexpm/elixir:1.17.2-erlang-27.0.1-ubuntu-focal-20240530"
+ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-focal-20240427"
 
 # Pre-stages for base image variants
 
