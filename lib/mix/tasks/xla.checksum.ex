@@ -30,12 +30,31 @@ defmodule Mix.Tasks.Xla.Checksum do
   end
 
   defp download_checksum!(url) do
-    case XLA.Utils.download(url, %XLA.Checksumer{}) do
+    case with_retry(fn -> XLA.Utils.download(url, %XLA.Checksumer{}) end, 3) do
       {:ok, checksum} ->
         checksum
 
       {:error, message} ->
         Mix.raise("failed to download archive from #{url}, reason: #{message}")
     end
+  end
+
+  defp with_retry(fun, retries) when retries > 0 do
+    first_try = fun.()
+
+    Enum.reduce_while(1..retries//1, first_try, fn n, result ->
+      case result do
+        {:ok, _} ->
+          {:halt, result}
+
+        {:error, message} ->
+          Mix.shell().info("Retrying request, attempt #{n} failed with reason: #{message}")
+
+          wait_in_ms = :rand.uniform(n * 2_000)
+          Process.sleep(wait_in_ms)
+
+          {:cont, fun.()}
+      end
+    end)
   end
 end
