@@ -9,6 +9,7 @@ defmodule XLA.MixProject do
       version: @version,
       description: "Precompiled XLA binaries",
       elixir: "~> 1.12",
+      aliases: aliases(),
       deps: deps(),
       compilers: Mix.compilers() ++ if(build?(), do: [:elixir_make], else: []),
       make_env: &XLA.make_env/0,
@@ -18,7 +19,15 @@ defmodule XLA.MixProject do
   end
 
   def application do
-    [extra_applications: [:logger]]
+    [extra_applications: [:logger, :inets, :ssl, :public_key, :crypto]]
+  end
+
+  def aliases do
+    [
+      # When compiling the checksum task, code paths are pruned, so we
+      # explicitly load hex back
+      "hex.publish": ["xla.checksum", fn _ -> Mix.ensure_application!(:hex) end, "hex.publish"]
+    ]
   end
 
   defp deps do
@@ -34,7 +43,7 @@ defmodule XLA.MixProject do
       links: %{
         "GitHub" => "https://github.com/elixir-nx/xla"
       },
-      files: ~w(extension lib Makefile mix.exs README.md LICENSE CHANGELOG.md)
+      files: ~w(extension lib Makefile mix.exs README.md LICENSE CHANGELOG.md checksum.txt)
     ]
   end
 

@@ -30,3 +30,6 @@ xla-*.tar
 
 # Output from compilations within Docker
 /builds/output/
+
+# Archive checksums file
+/checksum.txt

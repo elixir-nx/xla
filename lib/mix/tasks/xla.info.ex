@@ -11,7 +11,7 @@ defmodule Mix.Tasks.Xla.Info do
   end
 
   def run(["release_tag"]) do
-    Mix.shell().info(XLA.release_tag())
+    Mix.shell().info("v" <> XLA.version())
   end
 
   def run(["build_archive_dir"]) do
