@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.8.0](https://github.com/elixir-nx/xla/tree/v0.8.0) (2024-08-17)
+
+### Added
+
+* Integrity verification when downloading the precompiled binaries ([#94](https://github.com/elixir-nx/xla/pull/94))
+
+### Changed
+
+* Bumped the version requirement for CUDA 12 to cuDNN 9.1+ ([#93](https://github.com/elixir-nx/xla/pull/93))
+* Archive file names to include the release version
+* Dropped the requirement for either `wget` or `curl` to be installed ([#94](https://github.com/elixir-nx/xla/pull/94))
+
+### Removed
+
+* Removed the `XLA_HTTP_HEADERS` environment variable ([#94](https://github.com/elixir-nx/xla/pull/94))
+
+### Fixed
+
+* Download failures due to GitHub API rate limiting on CI ([#94](https://github.com/elixir-nx/xla/pull/94))
+
 ## [v0.7.1](https://github.com/elixir-nx/xla/tree/v0.7.1) (2024-07-01)
 
 ### Changed
