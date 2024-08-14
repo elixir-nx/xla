@@ -1,12 +1,25 @@
 defmodule XLA do
   @moduledoc """
-  API for accessing compiled XLA archives.
+  API for accessing precompiled XLA archives.
   """
 
   require Logger
 
   @version Mix.Project.config()[:version]
-  @github_repo "elixir-nx/xla"
+
+  @base_url "https://github.com/elixir-nx/xla/releases/download/v#{@version}"
+
+  @precompiled_targets [
+    "x86_64-darwin-cpu",
+    "aarch64-darwin-cpu",
+    "x86_64-linux-gnu-cpu",
+    "aarch64-linux-gnu-cpu",
+    "x86_64-linux-gnu-cuda12",
+    "aarch64-linux-gnu-cuda12",
+    "x86_64-linux-gnu-tpu"
+  ]
+
+  @supported_xla_targets ["cpu", "cuda", "rocm", "tpu", "cuda12"]
 
   @doc """
   Returns path to the precompiled XLA archive.
@@ -18,6 +31,8 @@ defmodule XLA do
   """
   @spec archive_path!() :: Path.t()
   def archive_path!() do
+    XLA.Utils.start_inets_profile()
+
     cond do
       build?() ->
         # The archive should have already been built by this point
@@ -29,10 +44,12 @@ defmodule XLA do
         path
 
       true ->
-        path = archive_path_for_matching_download()
-        unless File.exists?(path), do: download_matching!(path)
+        path = archive_path_for_precompiled_download()
+        unless File.exists?(path), do: download_precompiled!(path)
         path
     end
+  after
+    XLA.Utils.stop_inets_profile()
   end
 
   defp build?() do
@@ -46,7 +63,7 @@ defmodule XLA do
   defp xla_target() do
     target = System.get_env("XLA_TARGET") || infer_xla_target() || "cpu"
 
-    supported_xla_targets = ["cpu", "cuda", "rocm", "tpu", "cuda12"]
+    supported_xla_targets = @supported_xla_targets
 
     unless target in supported_xla_targets do
       listing = supported_xla_targets |> Enum.map(&inspect/1) |> Enum.join(", ")
@@ -73,6 +90,204 @@ defmodule XLA do
       :filename.basedir(:user_cache, "xla")
     end
   end
+
+  defp target() do
+    case target_triplet() do
+      {arch, os, nil} -> "#{arch}-#{os}-#{xla_target()}"
+      {arch, os, abi} -> "#{arch}-#{os}-#{abi}-#{xla_target()}"
+    end
+  end
+
+  defp target_triplet() do
+    if target = System.get_env("XLA_TARGET_PLATFORM") do
+      case String.split(target, "-") do
+        [arch, os, abi] ->
+          {arch, os, abi}
+
+        [arch, os] ->
+          {arch, os, nil}
+
+        other ->
+          raise "expected XLA_TARGET_PLATFORM to be either ARCHITECTURE-OS-ABI or ARCHITECTURE-OS, got: #{other}"
+      end
+    else
+      :erlang.system_info(:system_architecture)
+      |> List.to_string()
+      |> String.split("-")
+      |> case do
+        ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", nil}
+        [arch, _vendor, "darwin" <> _ | _] -> {arch, "darwin", nil}
+        [arch, _vendor, os, abi] -> {arch, os, abi}
+        [arch, _vendor, os] -> {arch, os, nil}
+        ["win32"] -> {"x86_64", "windows", nil}
+      end
+    end
+  end
+
+  defp archive_path_for_build() do
+    filename = archive_filename(target())
+    cache_path(["build", filename])
+  end
+
+  defp archive_path_for_external_download(url) do
+    hash = url |> :erlang.md5() |> Base.encode32(case: :lower, padding: false)
+    filename = "xla_extension-#{hash}.tar.gz"
+    cache_path(["external", filename])
+  end
+
+  defp archive_path_for_precompiled_download() do
+    filename = archive_filename(target())
+    cache_path(["download", filename])
+  end
+
+  defp archive_filename(target) do
+    "xla_extension-#{target}.tar.gz"
+  end
+
+  defp cache_path(parts) do
+    base_dir = xla_cache_dir()
+    Path.join([base_dir, @version | parts])
+  end
+
+  defp download_external!(url, archive_path) do
+    Logger.info("Downloading XLA archive from #{url}")
+
+    case download_archive(url, archive_path) do
+      :ok ->
+        Logger.info("Successfully downloaded the XLA archive")
+
+      {:error, message} ->
+        File.rm(archive_path)
+        raise message
+    end
+  end
+
+  defp download_precompiled!(archive_path) do
+    expected_filename = Path.basename(archive_path)
+
+    target = target()
+    precompiled_targets = precompiled_targets()
+
+    if target not in precompiled_targets do
+      listing = Enum.map_join(precompiled_targets, "\n", &("  * " <> &1))
+
+      raise """
+      no precompiled XLA archive available for this target: #{target}.
+
+      The available targets are:
+
+      #{listing}
+
+      You can compile XLA locally by setting an environment variable: XLA_BUILD=true\
+      """
+    end
+
+    Logger.info("Downloading a precompiled XLA archive for target #{target}")
+
+    url = release_file_url(expected_filename)
+
+    with :ok <- download_archive(url, archive_path),
+         :ok <- verify_integrity(archive_path) do
+      Logger.info("Successfully downloaded the XLA archive")
+    else
+      {:error, message} ->
+        File.rm(archive_path)
+        raise message
+    end
+  end
+
+  defp release_file_url(filename) do
+    @base_url <> "/" <> filename
+  end
+
+  defp download_archive(url, archive_path) do
+    File.mkdir_p!(Path.dirname(archive_path))
+
+    file = File.stream!(archive_path)
+
+    case XLA.Utils.download(url, file) do
+      {:ok, _file} ->
+        :ok
+
+      {:error, message} ->
+        {:error, "failed to download the XLA archive from #{url}, reason: #{message}"}
+    end
+  end
+
+  defp verify_integrity(path) do
+    filename = Path.basename(path)
+    checksum = compute_file_checksum!(path)
+
+    case read_checksums!() do
+      %{^filename => ^checksum} ->
+        :ok
+
+      %{^filename => _} ->
+        {:error, "the integrity check failed for file #{filename}, the checksum does not match"}
+
+      %{} ->
+        {:error, "no entry for file #{filename} in the checksum file"}
+    end
+  end
+
+  @doc false
+  def write_checksums!(%{} = checksums) do
+    content =
+      checksums
+      |> Enum.sort()
+      |> Enum.map_join("", fn {filename, checksum} ->
+        checksum <> "  " <> filename <> "\n"
+      end)
+
+    File.write!(checksum_path(), content)
+  end
+
+  defp read_checksums!() do
+    content = File.read!(checksum_path())
+
+    for line <- String.split(content, "\n", trim: true), into: %{} do
+      [checksum, filename] = String.split(line, "  ")
+      {filename, checksum}
+    end
+  end
+
+  defp compute_file_checksum!(path) do
+    path
+    |> File.stream!(64_000)
+    |> Enum.into(%XLA.Checksumer{})
+  end
+
+  defp checksum_path() do
+    Path.join(File.cwd!(), "checksum.txt")
+  end
+
+  defp precompiled_targets(), do: @precompiled_targets
+
+  # Used by tasks
+
+  @doc false
+  def build_archive_dir() do
+    Path.dirname(archive_path_for_build())
+  end
+
+  @doc false
+  def version(), do: @version
+
+  @doc false
+  def archive_filename_with_target() do
+    archive_filename(target())
+  end
+
+  @doc false
+  def precompiled_files() do
+    for target <- @precompiled_targets do
+      filename = archive_filename(target)
+      url = release_file_url(filename)
+      {filename, url}
+    end
+  end
+
+  # Configuration for elixir_make
 
   @doc false
   def make_env() do
@@ -114,204 +329,5 @@ defmodule XLA do
       "BUILD_ARCHIVE" => archive_path_for_build(),
       "BUILD_ARCHIVE_DIR" => build_archive_dir()
     }
-  end
-
-  @doc false
-  def build_archive_dir() do
-    Path.dirname(archive_path_for_build())
-  end
-
-  @doc false
-  def release_tag() do
-    "v" <> @version
-  end
-
-  @doc false
-  def archive_filename_with_target() do
-    "xla_extension-#{target()}.tar.gz"
-  end
-
-  defp target() do
-    case target_triplet() do
-      {arch, os, nil} -> "#{arch}-#{os}-#{xla_target()}"
-      {arch, os, abi} -> "#{arch}-#{os}-#{abi}-#{xla_target()}"
-    end
-  end
-
-  defp target_triplet() do
-    if target = System.get_env("XLA_TARGET_PLATFORM") do
-      case String.split(target, "-") do
-        [arch, os, abi] ->
-          {arch, os, abi}
-
-        [arch, os] ->
-          {arch, os, nil}
-
-        other ->
-          raise "expected XLA_TARGET_PLATFORM to be either ARCHITECTURE-OS-ABI or ARCHITECTURE-OS, got: #{other}"
-      end
-    else
-      :erlang.system_info(:system_architecture)
-      |> List.to_string()
-      |> String.split("-")
-      |> case do
-        ["arm" <> _, _vendor, "darwin" <> _ | _] -> {"aarch64", "darwin", nil}
-        [arch, _vendor, "darwin" <> _ | _] -> {arch, "darwin", nil}
-        [arch, _vendor, os, abi] -> {arch, os, abi}
-        [arch, _vendor, os] -> {arch, os, nil}
-        ["win32"] -> {"x86_64", "windows", nil}
-      end
-    end
-  end
-
-  defp archive_path_for_build() do
-    filename = archive_filename_with_target()
-    cache_path(["build", filename])
-  end
-
-  defp archive_path_for_external_download(url) do
-    hash = url |> :erlang.md5() |> Base.encode32(case: :lower, padding: false)
-    filename = "xla_extension-#{hash}.tar.gz"
-    cache_path(["external", filename])
-  end
-
-  defp archive_path_for_matching_download() do
-    filename = archive_filename_with_target()
-    cache_path(["download", filename])
-  end
-
-  defp cache_path(parts) do
-    base_dir = xla_cache_dir()
-    Path.join([base_dir, @version, "cache" | parts])
-  end
-
-  defp download_external!(url, archive_path) do
-    assert_network_tool!()
-    Logger.info("Downloading XLA archive from #{url}")
-    download_archive!(url, archive_path)
-  end
-
-  defp download_matching!(archive_path) do
-    assert_network_tool!()
-
-    expected_filename = Path.basename(archive_path)
-
-    filenames =
-      case list_release_files() do
-        {:ok, filenames} ->
-          filenames
-
-        :error ->
-          raise """
-          could not fetch #{release_tag()} release at https://github.com/#{@github_repo}/releases
-
-          This may happen if GitHub is rate-limiting your downloads. You can increase your rate \
-          limit by setting the XLA_HTTP_HEADERS environment variable with your GitHub credentials:
-
-              XLA_HTTP_HEADERS="Authorization: Bearer ${GITHUB_TOKEN}"
-          """
-      end
-
-    unless expected_filename in filenames do
-      listing = filenames |> Enum.map(&["    * ", &1, "\n"]) |> IO.iodata_to_binary()
-
-      raise "none of the precompiled archives matches your target\n" <>
-              "  Expected:\n" <>
-              "    * #{expected_filename}\n" <>
-              "  Found:\n" <>
-              listing <>
-              "\nYou can compile XLA locally by setting an environment variable: XLA_BUILD=true"
-    end
-
-    Logger.info("Found a matching archive (#{expected_filename}), going to download it")
-    url = release_file_url(expected_filename)
-    download_archive!(url, archive_path)
-  end
-
-  defp download_archive!(url, archive_path) do
-    File.mkdir_p!(Path.dirname(archive_path))
-
-    if download(url, archive_path) == :error do
-      raise "failed to download the XLA archive from #{url}"
-    end
-
-    Logger.info("Successfully downloaded the XLA archive")
-  end
-
-  defp assert_network_tool!() do
-    unless network_tool() do
-      raise "expected either curl or wget to be available in your system, but neither was found"
-    end
-  end
-
-  defp list_release_files() do
-    url = "https://api.github.com/repos/#{@github_repo}/releases/tags/#{release_tag()}"
-
-    with {:ok, body} <- get(url) do
-      # We don't have a JSON library available here, so we do
-      # a simple matching
-      {:ok,
-       Regex.scan(~r/"name":\s+"(.*\.tar\.gz)"/, body, capture: :all_but_first) |> List.flatten()}
-    end
-  end
-
-  defp release_file_url(filename) do
-    "https://github.com/#{@github_repo}/releases/download/#{release_tag()}/#{filename}"
-  end
-
-  defp download(url, dest) do
-    command =
-      case network_tool() do
-        :curl -> "curl --fail --location --output #{dest} #{curl_options()} #{url}"
-        :wget -> "wget --output-document=#{dest} #{wget_options()} #{url}"
-      end
-
-    case System.shell(command) do
-      {_, 0} -> :ok
-      _ -> :error
-    end
-  end
-
-  defp get(url) do
-    command =
-      case network_tool() do
-        :curl -> "curl --fail --silent --location #{curl_options()} #{url}"
-        :wget -> "wget --quiet --output-document=- #{wget_options()} #{url}"
-      end
-
-    case System.shell(command) do
-      {body, 0} -> {:ok, body}
-      _ -> :error
-    end
-  end
-
-  defp network_tool() do
-    cond do
-      executable_exists?("curl") -> :curl
-      executable_exists?("wget") -> :wget
-      true -> nil
-    end
-  end
-
-  defp executable_exists?(name), do: System.find_executable(name) != nil
-
-  defp http_headers() do
-    if headers = System.get_env("XLA_HTTP_HEADERS") do
-      headers
-      |> String.split(";", trim: true)
-      |> Enum.map(&String.trim/1)
-    else
-      []
-    end
-  end
-
-  defp curl_options() do
-    headers = http_headers()
-    Enum.map_join(headers, " ", &"--header '#{&1}'")
-  end
-
-  defp wget_options() do
-    headers = http_headers()
-    Enum.map_join(headers, " ", &"--header='#{&1}'")
   end
 end
