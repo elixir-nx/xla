@@ -141,7 +141,7 @@ defmodule XLA do
   end
 
   defp archive_filename(target) do
-    "xla_extension-#{target}.tar.gz"
+    "xla_extension-#{@version}-#{target}.tar.gz"
   end
 
   defp cache_path(parts) do
