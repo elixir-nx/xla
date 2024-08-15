@@ -24,10 +24,20 @@ defmodule XLA.MixProject do
 
   def aliases do
     [
-      # When compiling the checksum task, code paths are pruned, so we
-      # explicitly load hex back
-      "hex.publish": ["xla.checksum", fn _ -> Mix.ensure_application!(:hex) end, "hex.publish"]
+      "hex.publish": [&ensure_checksum_file/1, "hex.publish"]
     ]
+  end
+
+  defp ensure_checksum_file(_) do
+    valid? =
+      case File.read("checksum.txt") do
+        {:ok, content} -> content =~ @version
+        {:error, :enoent} -> false
+      end
+
+    if not valid? do
+      raise "run mix xla.checksum before releasing"
+    end
   end
 
   defp deps do
