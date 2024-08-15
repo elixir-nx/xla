@@ -253,7 +253,7 @@ defmodule XLA do
 
   defp compute_file_checksum!(path) do
     path
-    |> File.stream!(64_000)
+    |> File.stream!([], 64_000)
     |> Enum.into(%XLA.Checksumer{})
   end
 
