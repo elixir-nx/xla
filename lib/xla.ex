@@ -258,7 +258,11 @@ defmodule XLA do
   end
 
   defp checksum_path() do
-    Path.join(File.cwd!(), "checksum.txt")
+    # Note that this path points to the project source, which normally
+    # may not be available at runtime (in releases). However, we expect
+    # XLA to be called only during compilation, in which case this path
+    # is still available
+    Path.expand("../checksum.txt", __DIR__)
   end
 
   defp precompiled_targets(), do: @precompiled_targets
