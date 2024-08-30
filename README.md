@@ -24,7 +24,8 @@ only the host CPU. If a matching CUDA version is detected, the target is set to 
 | --- | --- |
 | cpu | |
 | tpu | libtpu |
-| cuda12 | CUDA >= 12.1, cuDNN >= 9.1 and < 10.0 |
+| cuda120 | CUDA >= 12.1, cuDNN >= 9.1 and < 10.0 |
+| cuda118 | CUDA >= 11.8 and <= 12, cuDNN |
 | cuda | CUDA x.y, cuDNN (building from source only) |
 | rocm | ROCm (building from source only) |
 
