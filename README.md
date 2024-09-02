@@ -72,7 +72,7 @@ cache location for the given operating system.
 
 #### `XLA_TARGET_PLATFORM`
 
-The target triplet describing the target platform, such as `aarch64-linux-gcc`. By default
+The target triplet describing the target platform, such as `aarch64-linux-gnu`. By default
 this target is inferred for the host, however you may want to override this when cross-compiling
 the project using Nerves.
 
