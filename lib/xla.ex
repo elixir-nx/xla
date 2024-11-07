@@ -38,6 +38,9 @@ defmodule XLA do
         # The archive should have already been built by this point
         archive_path_for_build()
 
+      path = xla_archive_path() ->
+        path
+
       url = xla_archive_url() ->
         path = archive_path_for_external_download(url)
         unless File.exists?(path), do: download_external!(url, path)
@@ -54,6 +57,10 @@ defmodule XLA do
 
   defp build?() do
     System.get_env("XLA_BUILD") in ~w(1 true)
+  end
+
+  defp xla_archive_path() do
+    System.get_env("XLA_ARCHIVE_PATH")
   end
 
   defp xla_archive_url() do
