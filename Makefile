@@ -4,7 +4,8 @@
 # BUILD_INTERNAL_FLAGS
 
 # System vars
-TEMP ?= $(HOME)/.cache
+XDG_CACHE_HOME ?= $(HOME)/.cache # Default ENV for cache on Linux
+TEMP ?= $(XDG_CACHE_HOME)
 
 # Public configuration
 BUILD_MODE ?= opt # can also be dbg
