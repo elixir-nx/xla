@@ -1,7 +1,12 @@
 defmodule XLA do
-  @moduledoc """
-  API for accessing precompiled XLA archives.
-  """
+  @external_resource "README.md"
+
+  [_, readme_docs, _] =
+    "README.md"
+    |> File.read!()
+    |> String.split("<!-- Docs -->")
+
+  @moduledoc readme_docs
 
   require Logger
 

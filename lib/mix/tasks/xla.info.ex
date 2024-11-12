@@ -1,7 +1,6 @@
 defmodule Mix.Tasks.Xla.Info do
-  @moduledoc """
-  Returns relevant information about the XLA archive.
-  """
+  @moduledoc false
+  # Returns relevant information about the XLA archive.
 
   use Mix.Task
 
