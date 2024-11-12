@@ -136,7 +136,8 @@ There are two known workarounds:
 
 If you still get the error, you can also try setting `PYTHON_BIN_PATH`, like `export PYTHON_BIN_PATH=/usr/bin/python3.9`.
 
-After doing any of the steps above, it may be necessary to clear the build cache by removing ` ~/.cache/xla_extension`.
+After doing any of the steps above, it may be necessary to clear the build cache by removing ` ~/.cache/xla_build`
+(or the corresponding OS-specific cache location).
 
 ### GPU support
 

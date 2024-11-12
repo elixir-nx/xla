@@ -338,7 +338,8 @@ defmodule XLA do
       "BUILD_INTERNAL_FLAGS" => bazel_build_flags,
       "ROOT_DIR" => Path.expand("..", __DIR__),
       "BUILD_ARCHIVE" => archive_path_for_build(),
-      "BUILD_ARCHIVE_DIR" => build_archive_dir()
+      "BUILD_ARCHIVE_DIR" => build_archive_dir(),
+      "BUILD_CACHE_DIR" => :filename.basedir(:user_cache, "xla_build")
     }
   end
 end
