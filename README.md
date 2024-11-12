@@ -1,5 +1,7 @@
 # XLA
 
+<!-- Docs -->
+
 Precompiled [XLA](https://github.com/openxla/xla) binaries for [EXLA](https://github.com/elixir-nx/nx/tree/main/exla).
 
 Currently supports UNIX systems, including macOS (although no built-in support for Apple Metal).
@@ -163,6 +165,8 @@ You can use the following env vars to customize your build:
 You can further configure XLA runtime options with `XLA_FLAGS`,
 see: [xla/debug_options_flags.cc](https://github.com/openxla/xla/blob/main/xla/debug_options_flags.cc)
 for the list of available flags.
+
+<!-- Docs -->
 
 ## Release process
 

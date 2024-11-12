@@ -1,7 +1,6 @@
 defmodule Mix.Tasks.Xla.Checksum do
-  @moduledoc """
-  Generates a checksum file for all precompiled artifacts.
-  """
+  @moduledoc false
+  # Generates a checksum file for all precompiled artifacts.
 
   use Mix.Task
 

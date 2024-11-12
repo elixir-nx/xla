@@ -59,10 +59,9 @@ defmodule XLA.MixProject do
 
   def docs do
     [
-      main: "readme",
+      main: "XLA",
       source_url: "https://github.com/elixir-nx/xla",
-      source_ref: "v#{@version}",
-      extras: ["README.md"]
+      source_ref: "v#{@version}"
     ]
   end
 
