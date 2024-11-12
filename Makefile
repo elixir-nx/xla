@@ -1,14 +1,12 @@
 # Environment variables passed via elixir_make
 # ROOT_DIR
-# BUILD_ARCHIVE
 # BUILD_INTERNAL_FLAGS
-
-# System vars
-TEMP ?= $(HOME)/.cache
+# BUILD_ARCHIVE
+# BUILD_ARCHIVE_DIR
+# BUILD_CACHE_DIR
 
 # Public configuration
 BUILD_MODE ?= opt # can also be dbg
-BUILD_CACHE ?= $(TEMP)/xla_extension
 OPENXLA_GIT_REPO ?= https://github.com/openxla/xla.git
 
 OPENXLA_GIT_REV ?= fd58925adee147d38c25a085354e15427a12d00a
@@ -17,7 +15,7 @@ OPENXLA_GIT_REV ?= fd58925adee147d38c25a085354e15427a12d00a
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
 
 OPENXLA_NS = xla-$(OPENXLA_GIT_REV)
-OPENXLA_DIR = $(BUILD_CACHE)/$(OPENXLA_NS)
+OPENXLA_DIR = $(BUILD_CACHE_DIR)/$(OPENXLA_NS)
 OPENXLA_XLA_EXTENSION_NS = xla/extension
 OPENXLA_XLA_EXTENSION_DIR = $(OPENXLA_DIR)/$(OPENXLA_XLA_EXTENSION_NS)
 OPENXLA_XLA_BUILD_ARCHIVE = $(OPENXLA_DIR)/bazel-bin/$(OPENXLA_XLA_EXTENSION_NS)/xla_extension.tar.gz
