@@ -119,8 +119,8 @@ defmodule XLA do
         [arch, os] ->
           {arch, os, nil}
 
-        other ->
-          raise "expected XLA_TARGET_PLATFORM to be either ARCHITECTURE-OS-ABI or ARCHITECTURE-OS, got: #{other}"
+        _other ->
+          raise "expected XLA_TARGET_PLATFORM to be either ARCHITECTURE-OS-ABI or ARCHITECTURE-OS, got: #{target}"
       end
     else
       :erlang.system_info(:system_architecture)
