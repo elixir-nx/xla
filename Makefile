@@ -9,10 +9,15 @@
 BUILD_MODE ?= opt # can also be dbg
 OPENXLA_GIT_REPO ?= https://github.com/openxla/xla.git
 
-OPENXLA_GIT_REV ?= fd58925adee147d38c25a085354e15427a12d00a
+OPENXLA_GIT_REV ?= cf7150f5755f7c5d985038410bd5c62c5a0debc2
 
 # Private configuration
+PYTHON_PATH ?= $(shell python -c "import sys; print(sys.executable)")
+PYTHON_DIR=$(dir $(PYTHON_PATH))
+MACOS_SDK_VERSION = $(shell xcrun --sdk macosx --show-sdk-version)
 BAZEL_FLAGS = --define "framework_shared_object=false" -c $(BUILD_MODE)
+BAZEL_FLAGS += --action_env=PATH=$(PYTHON_DIR):$(PATH)
+BAZEL_FLAGS += --macos_sdk_version=$(MACOS_SDK_VERSION)
 
 OPENXLA_NS = xla-$(OPENXLA_GIT_REV)
 OPENXLA_DIR = $(BUILD_CACHE_DIR)/$(OPENXLA_NS)
@@ -24,7 +29,7 @@ $(BUILD_ARCHIVE): $(OPENXLA_DIR) extension/BUILD
 	rm -f $(OPENXLA_XLA_EXTENSION_DIR) && \
 		ln -s "$(ROOT_DIR)/extension" $(OPENXLA_XLA_EXTENSION_DIR) && \
 		cd $(OPENXLA_DIR) && \
-		bazel build $(BAZEL_FLAGS) $(BUILD_FLAGS) $(BUILD_INTERNAL_FLAGS) //$(OPENXLA_XLA_EXTENSION_NS):xla_extension && \
+		bazel build $(BAZEL_FLAGS) $(BUILD_FLAGS) //$(OPENXLA_XLA_EXTENSION_NS):xla_extension && \
 		mkdir -p $(dir $(BUILD_ARCHIVE)) && \
 		cp -f $(OPENXLA_XLA_BUILD_ARCHIVE) $(BUILD_ARCHIVE)
 
@@ -37,8 +42,7 @@ $(OPENXLA_DIR):
 		git remote add origin $(OPENXLA_GIT_REPO) && \
 		git fetch --depth 1 origin $(OPENXLA_GIT_REV) && \
 		git checkout FETCH_HEAD && \
-		bash patches/apply.sh && \
-		rm $(OPENXLA_DIR)/.bazelversion
+		bash patches/apply.sh
 
 # Print OPENXLA Dir
 PTD:

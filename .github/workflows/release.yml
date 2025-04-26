@@ -35,10 +35,10 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "6.5.0"
+          version: "7.4.1"
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.11.11"
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archives
       - run: mix deps.get
@@ -64,10 +64,10 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "6.5.0"
+          version: "7.4.1"
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.11.11"
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archive
       - run: mix deps.get
@@ -88,10 +88,10 @@ jobs:
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
-          version: "6.5.0"
+          version: "7.4.1"
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.11.11"
       - run: python -m pip install --upgrade pip numpy
       # Build and upload the archive
       - run: mix deps.get
