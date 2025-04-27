@@ -60,7 +60,7 @@ RUN wget -O bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.1
   chmod +x bazel && \
   mv bazel /usr/local/bin/bazel
 
-ENV USE_BAZEL_VERSION 6.5.0
+ENV USE_BAZEL_VERSION 7.4.1
 
 # Install Python and the necessary global dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip && \
