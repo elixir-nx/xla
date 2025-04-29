@@ -134,9 +134,9 @@ genrule(
   srcs = [
     ":xla_extension_dep_headers",
   ],
-  outs = ["include"],
+  outs = ["include.tar.gz"],
   cmd = """
-    mkdir $@
+    HEADERS_DIR=$$(mktemp -d)
     for f in $(SRCS); do
       d="$${f%/*}"
       d="$${d#bazel-out/*/genfiles/}"
@@ -169,12 +169,15 @@ genrule(
       # Remap ml_dtypes paths
       d="$${d/_virtual_includes\\/intn\\/ml_dtypes/ml_dtypes}"
       d="$${d/_virtual_includes\\/float8\\/ml_dtypes/ml_dtypes}"
-      mkdir -p "$@/$${d}"
-      cp "$${f}" "$@/$${d}/"
+      mkdir -p "$${HEADERS_DIR}/$${d}"
+      cp "$${f}" "$${HEADERS_DIR}/$${d}/"
     done
     # Files in xla/mlir_hlo include sibling headers from mhlo, so we
     # need to mirror them in includes
-    cp -r $@/xla/mlir_hlo/mhlo $@
+    cp -r $${HEADERS_DIR}/xla/mlir_hlo/mhlo $${HEADERS_DIR}
+    # Create the final tarball
+    tar czf "$@" -C $${HEADERS_DIR} .
+    rm -rf $${HEADERS_DIR}
     """,
   )
 
@@ -208,10 +211,12 @@ genrule(
   + if_with_tpu_support([
     ":libtpu_so"
   ]),
-  outs = ["lib"],
+  outs = ["lib.tar.gz"],
   cmd = """
-    mkdir $@
-    mv $(SRCS) $@
+    LIB_DIR=$$(mktemp -d)
+    mv $(SRCS) $${LIB_DIR}/
+    tar czf "$@" -C $${LIB_DIR} .
+    rm -rf $${LIB_DIR}
   """
 )
 
@@ -225,7 +230,13 @@ genrule(
   ],
   cmd = """
     mkdir xla_extension
-    cp -r $(SRCS) xla_extension
+    # Extract the lib tarball
+    mkdir xla_extension/lib
+    tar xzf $(location :xla_extension_lib) -C xla_extension/lib
+    # Extract the headers tarball
+    mkdir xla_extension/include
+    tar xzf $(location :xla_extension_headers) -C xla_extension/include
+    # Create the final package tarball
     tar czf "$@" xla_extension
   """
 )
