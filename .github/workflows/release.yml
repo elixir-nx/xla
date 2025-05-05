@@ -9,9 +9,9 @@ jobs:
     if: github.ref_type == 'tag'
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,20 +23,20 @@ jobs:
   linux:
     name: "x86_64-linux-gnu-{cpu,tpu}"
     needs: [create_draft_release]
-    # We intentionally build on ubuntu 20 to compile against
+    # We intentionally build on ubuntu 22 to compile against
     # an older version of glibc
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "24"
           elixir-version: "1.15.8"
       # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "7.4.1"
-      - uses: actions/setup-python@v2
+      - uses: bazel-contrib/setup-bazel@0.14.0
+        env:
+          USE_BAZEL_VERSION: 7.4.1
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
@@ -56,16 +56,16 @@ jobs:
   macos:
     name: "x86_64-darwin-cpu"
     needs: [create_draft_release]
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: brew install elixir
       - run: mix local.hex --force
       # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "7.4.1"
-      - uses: actions/setup-python@v2
+      - uses: bazel-contrib/setup-bazel@0.14.0
+        env:
+          USE_BAZEL_VERSION: 7.4.1
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
@@ -80,16 +80,16 @@ jobs:
   macos_arm:
     name: "aarch64-darwin-cpu (cross-compiled)"
     needs: [create_draft_release]
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: brew install elixir
       - run: mix local.hex --force
       # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "7.4.1"
-      - uses: actions/setup-python@v2
+      - uses: bazel-contrib/setup-bazel@0.14.0
+        env:
+          USE_BAZEL_VERSION: 7.4.1
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
