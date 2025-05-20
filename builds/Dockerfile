@@ -1,5 +1,5 @@
 ARG VARIANT
-ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-focal-20240427"
+ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-jammy-20250404"
 
 # Pre-stages for base image variants
 
@@ -48,15 +48,13 @@ ENV LC_ALL C.UTF-8
 ARG DEBIAN_FRONTEND=noninteractive
 
 # We need to install "add-apt-repository" first
-RUN apt-get update && apt-get install -y software-properties-common && \
-  # Add repository with the latest git version
-  add-apt-repository ppa:git-core/ppa && \
+RUN apt-get update && \
   # Install basic system dependencies
-  apt-get update && apt-get install -y ca-certificates curl git unzip wget && \
+  apt-get update && apt-get install -y ca-certificates curl git unzip wget clang && \
   apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install Bazel using Bazelisk (works for both amd and arm)
-RUN wget -O bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.18.0/bazelisk-linux-$(dpkg --print-architecture)" && \
+RUN wget -O bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-$(dpkg --print-architecture)" && \
   chmod +x bazel && \
   mv bazel /usr/local/bin/bazel
 
