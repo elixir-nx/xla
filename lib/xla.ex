@@ -337,7 +337,14 @@ defmodule XLA do
         _ -> []
       end
 
-    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_cpu, " ")
+    # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
+    bazel_build_flags_shared = ["--copt=-Wno-error=unused-command-line-argument"]
+
+    bazel_build_flags =
+      Enum.join(
+        bazel_build_flags_accelerator ++ bazel_build_flags_cpu ++ bazel_build_flags_shared,
+        " "
+      )
 
     # Additional environment variables passed to make
     %{
