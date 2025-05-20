@@ -1,6 +1,7 @@
 name: Release
 on:
   push:
+    branches: ["jk-tmp-build"]
     tags:
       - "v*.*.*"
 
@@ -45,11 +46,13 @@ jobs:
           version: "18"
       # Build and upload the archives
       - run: mix deps.get
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: tpu
@@ -75,7 +78,8 @@ jobs:
           version: "18"
       # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
@@ -101,7 +105,8 @@ jobs:
           version: "18"
       # Build and upload the archive
       - run: mix deps.get
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
