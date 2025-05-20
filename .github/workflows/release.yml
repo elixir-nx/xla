@@ -93,7 +93,7 @@ jobs:
           # which calls xcrun clang and points to the system clang version.
           # This env explicitly disables this toolchain, so that our Clang
           # installation is used instead.
-          BUILD_INTERNAL_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
+          BUILD_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
 
   macos_arm:
     name: "aarch64-darwin-cpu"
@@ -125,4 +125,4 @@ jobs:
           # which calls xcrun clang and points to the system clang version.
           # This env explicitly disables this toolchain, so that our Clang
           # installation is used instead.
-          BUILD_INTERNAL_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
+          BUILD_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
