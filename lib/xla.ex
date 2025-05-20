@@ -335,11 +335,12 @@ defmodule XLA do
           []
       end
 
-    bazel_build_flags_cpu =
-      case target_triplet() do
-        {"aarch64", "darwin", _} -> ["--config=macos_arm64"]
-        _ -> []
-      end
+      # TODO remove?
+    bazel_build_flags_cpu = []
+      # case target_triplet() do
+      #   {"aarch64", "darwin", _} -> ["--config=macos_arm64"]
+      #   _ -> []
+      # end
 
     bazel_build_flags_shared = [
       # Always use Clang

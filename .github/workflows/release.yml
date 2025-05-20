@@ -66,7 +66,7 @@ jobs:
   macos:
     name: "x86_64-darwin-cpu"
     # needs: [create_draft_release]
-    runs-on: macos-13
+    runs-on: macos-14-large
     steps:
       - uses: actions/checkout@v4
       - run: brew install elixir
@@ -91,9 +91,9 @@ jobs:
           XLA_TARGET: cpu
 
   macos_arm:
-    name: "aarch64-darwin-cpu (cross-compiled)"
+    name: "aarch64-darwin-cpu"
     # needs: [create_draft_release]
-    runs-on: macos-13
+    runs-on: macos-14-xlarge
     steps:
       - uses: actions/checkout@v4
       - run: brew install elixir
@@ -116,6 +116,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-          XLA_TARGET_PLATFORM: "aarch64-darwin"
-          # Explicitly cross-compile for arm64
-          BUILD_FLAGS: "--config=macos_arm64"
+          # TODO remove?
+          # XLA_TARGET_PLATFORM: "aarch64-darwin"
+          # # Explicitly cross-compile for arm64
+          # BUILD_FLAGS: "--config=macos_arm64"
