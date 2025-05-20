@@ -70,6 +70,8 @@ RUN apt-get update && apt-get install -y python3 python3-pip && \
 
 # Setup project files
 
+WORKDIR /xla
+
 ARG XLA_TARGET
 
 ENV XLA_TARGET=${XLA_TARGET}

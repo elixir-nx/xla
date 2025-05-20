@@ -1,0 +1,2 @@
+ERROR: Cannot connect to the Docker daemon at unix:///Users/jonatanklosko/.docker/run/docker.sock. Is the docker daemon running?
+        0.34 real         0.08 user         0.08 sys
