@@ -313,7 +313,8 @@ defmodule XLA do
           [
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
             "--config=cuda",
-            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/
+            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/,
+            "--@local_config_cuda//:cuda_compiler=clang"
           ]
 
         "rocm" <> _ ->
