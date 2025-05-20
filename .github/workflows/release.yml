@@ -24,44 +24,44 @@ jobs:
             gh release create --title ${{ github.ref_name }} --draft ${{ github.ref_name }}
           fi
 
-  # linux:
-  #   name: "x86_64-linux-gnu-{cpu,tpu}"
-  #   # needs: [create_draft_release]
-  #   # We intentionally build on ubuntu 22 to compile against
-  #   # an older version of glibc
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: erlef/setup-beam@v1
-  #       with:
-  #         otp-version: "24"
-  #         elixir-version: "1.15.8"
-  #     # Setup the compilation environment
-  #     - uses: bazel-contrib/setup-bazel@0.14.0
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #     - run: python -m pip install --upgrade pip numpy
-  #     - run: |
-  #         # Install Clang
-  #         clang_version="18"
-  #         sudo apt-get update
-  #         sudo apt-get install -y wget gnupg software-properties-common lsb-release
-  #         wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- $clang_version
-  #         sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 200
-  #         sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$clang_version 200
-  #     # Build and upload the archives
-  #     - run: mix deps.get
-  #     # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-  #     - run: XLA_BUILD=true mix compile
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         XLA_TARGET: cpu
-  #     # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-  #     - run: XLA_BUILD=true mix compile
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         XLA_TARGET: tpu
+  linux:
+    name: "x86_64-linux-gnu-{cpu,tpu}"
+    # needs: [create_draft_release]
+    # We intentionally build on ubuntu 22 to compile against
+    # an older version of glibc
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "24"
+          elixir-version: "1.15.8"
+      # Setup the compilation environment
+      - uses: bazel-contrib/setup-bazel@0.14.0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip numpy
+      - run: |
+          # Install Clang
+          clang_version="18"
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg software-properties-common lsb-release
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- $clang_version
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$clang_version 200
+      # Build and upload the archives
+      - run: mix deps.get
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: tpu
 
   macos:
     name: "x86_64-darwin-cpu"
@@ -89,35 +89,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-          BUILD_INTERNAL_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
 
-  # macos_arm:
-  #   name: "aarch64-darwin-cpu"
-  #   # needs: [create_draft_release]
-  #   runs-on: macos-14
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - run: brew install elixir
-  #     - run: mix local.hex --force
-  #     # Setup the compilation environment
-  #     - uses: bazel-contrib/setup-bazel@0.14.0
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #     - run: python -m pip install --upgrade pip numpy
-  #     - name: Install Clang 18
-  #       run: |
-  #         brew update
-  #         brew install llvm@18
-  #         echo "/usr/local/opt/llvm@18/bin" >> $GITHUB_PATH
-  #     # Build and upload the archive
-  #     - run: mix deps.get
-  #     # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-  #     - run: XLA_BUILD=true mix compile
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         XLA_TARGET: cpu
-  #         # TODO remove?
-  #         # XLA_TARGET_PLATFORM: "aarch64-darwin"
-  #         # # Explicitly cross-compile for arm64
-  #         # BUILD_FLAGS: "--config=macos_arm64"
+  macos_arm:
+    name: "aarch64-darwin-cpu"
+    # needs: [create_draft_release]
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install elixir
+      - run: mix local.hex --force
+      # Setup the compilation environment
+      - uses: bazel-contrib/setup-bazel@0.14.0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip numpy
+      - name: Install Clang 18
+        run: |
+          brew update
+          brew install llvm@18
+          echo "/usr/local/opt/llvm@18/bin" >> $GITHUB_PATH
+      # Build and upload the archive
+      - run: mix deps.get
+      # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+      - run: XLA_BUILD=true mix compile
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: cpu
+          # TODO remove?
+          # XLA_TARGET_PLATFORM: "aarch64-darwin"
+          # # Explicitly cross-compile for arm64
+          # BUILD_FLAGS: "--config=macos_arm64"
