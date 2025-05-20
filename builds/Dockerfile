@@ -52,7 +52,7 @@ RUN apt-get update && \
   # Install basic system dependencies
   apt-get update && apt-get install -y ca-certificates curl git unzip wget && \
   # Install Clang
-  clang_version="20" && \
+  clang_version="18" && \
   apt-get install -y gnupg software-properties-common lsb-release && \
   wget -qO- https://apt.llvm.org/llvm.sh | bash -s -- $clang_version && \
   update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 100 && \
