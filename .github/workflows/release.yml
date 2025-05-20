@@ -89,6 +89,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
+          # One of the build steps uses local_config_apple_cc/wrapped_clang
+          # which calls xcrun clang and points to the system clang version.
+          # This env explicitly disables this toolchain, so that our Clang
+          # installation is used instead.
+          BUILD_INTERNAL_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
 
   macos_arm:
     name: "aarch64-darwin-cpu"
@@ -116,7 +121,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-          # TODO remove?
-          # XLA_TARGET_PLATFORM: "aarch64-darwin"
-          # # Explicitly cross-compile for arm64
-          # BUILD_FLAGS: "--config=macos_arm64"
+          # One of the build steps uses local_config_apple_cc/wrapped_clang
+          # which calls xcrun clang and points to the system clang version.
+          # This env explicitly disables this toolchain, so that our Clang
+          # installation is used instead.
+          BUILD_INTERNAL_FLAGS: "--repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1"
