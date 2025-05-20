@@ -42,7 +42,7 @@ ENV ROCM_PATH "/opt/rocm-${ROCM_VERSION}.0"
 FROM base-${VARIANT}
 
 # Set the missing UTF-8 locale, otherwise Elixir warns
-ENV LC_ALL C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # Make sure installing packages (like tzdata) doesn't prompt for configuration
 ARG DEBIAN_FRONTEND=noninteractive
@@ -64,7 +64,7 @@ RUN wget -O bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.2
   chmod +x bazel && \
   mv bazel /usr/local/bin/bazel
 
-ENV USE_BAZEL_VERSION 7.4.1
+ENV USE_BAZEL_VERSION=7.4.1
 
 # Install Python and the necessary global dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip && \
