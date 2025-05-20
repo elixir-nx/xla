@@ -50,7 +50,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 # We need to install "add-apt-repository" first
 RUN apt-get update && \
   # Install basic system dependencies
-  apt-get update && apt-get install -y ca-certificates curl git unzip wget clang && \
+  apt-get update && apt-get install -y ca-certificates curl git unzip wget && \
+  # Install Clang 18
+  apt-get install -y gnupg software-properties-common lsb-release && \
+  wget -qO- https://apt.llvm.org/llvm.sh | bash -s -- 18 && \
   apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install Bazel using Bazelisk (works for both amd and arm)

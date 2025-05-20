@@ -312,7 +312,8 @@ defmodule XLA do
         "cuda" <> _ ->
           [
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
-            ~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/
+            "--config=cuda",
+            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/
           ]
 
         "rocm" <> _ ->
@@ -320,7 +321,7 @@ defmodule XLA do
             "--config=rocm",
             "--action_env=HIP_PLATFORM=hcc",
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L128
-            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx1030,gfx1100"/
+            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx940,gfx941,gfx942,gfx1030,gfx1100,gfx1200,gfx1201"/
           ]
 
         "tpu" <> _ ->
