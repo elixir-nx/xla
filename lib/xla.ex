@@ -340,7 +340,6 @@ defmodule XLA do
     bazel_build_flags_shared = [
       # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
       "--copt=-Wno-error=unused-command-line-argument",
-      "--copt=-Xcompiler=-Wno-error=unused-command-line-argument",
       # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
       "--copt=-Wno-gnu-offsetof-extensions",
       "--copt=-Qunused-arguments",
