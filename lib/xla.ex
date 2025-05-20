@@ -329,7 +329,7 @@ defmodule XLA do
           ]
 
         "tpu" <> _ ->
-          ["--config=tpu"]
+          ["--define=with_tpu_support=true"]
 
         _ ->
           []
