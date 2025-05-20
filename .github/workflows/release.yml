@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  USE_BAZEL_VERSION: 7.4.1
+
 jobs:
   create_draft_release:
     if: github.ref_type == 'tag'
@@ -35,8 +38,6 @@ jobs:
           elixir-version: "1.15.8"
       # Setup the compilation environment
       - uses: bazel-contrib/setup-bazel@0.14.0
-        env:
-          USE_BAZEL_VERSION: 7.4.1
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -67,8 +68,6 @@ jobs:
       - run: mix local.hex --force
       # Setup the compilation environment
       - uses: bazel-contrib/setup-bazel@0.14.0
-        env:
-          USE_BAZEL_VERSION: 7.4.1
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -96,8 +95,6 @@ jobs:
       - run: mix local.hex --force
       # Setup the compilation environment
       - uses: bazel-contrib/setup-bazel@0.14.0
-        env:
-          USE_BAZEL_VERSION: 7.4.1
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
