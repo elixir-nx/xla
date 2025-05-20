@@ -313,7 +313,11 @@ defmodule XLA do
           [
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
             "--config=cuda",
-            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/
+            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/,
+            # See https://github.com/jax-ml/jax/blob/f2188786c225c7d16d8a7effd852470b2ad1b229/.bazelrc#L174-L176
+            # (by default Jax compiles CUDA code is compiled with NVCC, so we do the same)
+            ~s/--action_env=TF_NVCC_CLANG="1"/,
+            "--@local_config_cuda//:cuda_compiler=nvcc"
           ]
 
         "rocm" <> _ ->
