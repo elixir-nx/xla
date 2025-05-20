@@ -23,7 +23,7 @@ jobs:
 
   linux:
     name: "x86_64-linux-gnu-{cpu,tpu}"
-    needs: [create_draft_release]
+    # needs: [create_draft_release]
     # We intentionally build on ubuntu 22 to compile against
     # an older version of glibc
     runs-on: ubuntu-22.04
@@ -59,7 +59,7 @@ jobs:
 
   macos:
     name: "x86_64-darwin-cpu"
-    needs: [create_draft_release]
+    # needs: [create_draft_release]
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
 
   macos_arm:
     name: "aarch64-darwin-cpu (cross-compiled)"
-    needs: [create_draft_release]
+    # needs: [create_draft_release]
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
