@@ -44,12 +44,12 @@ jobs:
       - run: python -m pip install --upgrade pip numpy
       - run: |
           # Install Clang
-          clang_version="18"
-          sudo apt-get update
-          sudo apt-get install -y gnupg software-properties-common lsb-release
-          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- $clang_version
-          sudo  update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 100
-          sudo  update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$clang_version 100
+          clang_version="18" && \
+          sudo apt-get update && \
+          sudo apt-get install -y gnupg software-properties-common lsb-release && \
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- $clang_version && \
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 100 && \
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$clang_version 100
       # Build and upload the archives
       - run: mix deps.get
       # - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
