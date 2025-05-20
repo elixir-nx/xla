@@ -40,18 +40,19 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
+      - uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "18"
       # Build and upload the archives
       - run: mix deps.get
       - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-          CC: gcc-9
       - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: tpu
-          CC: gcc-9
 
   macos:
     name: "x86_64-darwin-cpu"
@@ -69,13 +70,15 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
+      - uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "18"
       # Build and upload the archive
       - run: mix deps.get
       - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: cpu
-          CC: gcc-9
 
   macos_arm:
     name: "aarch64-darwin-cpu (cross-compiled)"
@@ -93,6 +96,9 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
+      - uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "18"
       # Build and upload the archive
       - run: mix deps.get
       - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
@@ -102,4 +108,3 @@ jobs:
           XLA_TARGET_PLATFORM: "aarch64-darwin"
           # Explicitly cross-compile for arm64
           BUILD_FLAGS: "--config=macos_arm64"
-          CC: gcc-9

@@ -51,8 +51,8 @@ In addition to building in a local environment, you can build the ROCm binary us
 the Docker-based scripts in [`builds/`](https://github.com/elixir-nx/xla/tree/main/builds). You may want to adjust the ROCm
 version in `rocm.Dockerfile` accordingly.
 
-When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-5.7.0`
-and `LD_LIBRARY_PATH="/opt/rocm-5.7.0/lib"` (with your respective version). For further
+When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-6.0.0`
+and `LD_LIBRARY_PATH="/opt/rocm-6.0.0/lib"` (with your respective version). For further
 issues, feel free to open an issue.
 
 #### `XLA_BUILD`
@@ -94,6 +94,7 @@ You will need the following installed in your system for the compilation:
 
   * [Git](https://git-scm.com/) for fetching XLA source
   * [Bazel v7.4.1](https://bazel.build/) for compiling XLA
+  * [Clang 18](https://clang.llvm.org/) for compiling XLA
   * [Python3](https://python.org) with NumPy installed for compiling XLA
 
 ### Common issues
@@ -110,12 +111,12 @@ asdf install bazel 7.4.1
 asdf global bazel 7.4.1
 ```
 
-#### GCC
+#### Clang
 
-You may have issues with newer and older versions of GCC. XLA builds are known to work
-with GCC versions between 7.5 and 9.3. If your system uses a newer GCC version, you can
-install an older version and tell Bazel to use it with `export CC=/path/to/gcc-{version}`
-where version is the GCC version you installed.
+You may have issues with newer and older versions of Clang. XLA builds are known to work
+with Clang 18. If your system uses a different GCC version, you can install the specific
+one and tell Bazel to use it with `export CC=/path/to/clang-{version}` where version is
+the Clang version you installed.
 
 #### Python and asdf
 
