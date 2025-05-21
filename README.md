@@ -113,10 +113,9 @@ asdf global bazel 7.4.1
 
 #### Clang
 
-You may have issues with newer and older versions of Clang. XLA builds are known to work
-with Clang 18. If your system uses a different GCC version, you can install the specific
-one and tell Bazel to use it with `export CC=/path/to/clang-{version}` where version is
-the Clang version you installed.
+XLA builds are known to work with Clang 18. On macOS clang comes as part of Xcode SDK
+and the version may be older, though for macOS we have precompiled archives, so you
+most likely don't need to worry about it.
 
 #### Python and asdf
 

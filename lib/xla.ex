@@ -329,19 +329,16 @@ defmodule XLA do
           ]
 
         "tpu" <> _ ->
-          ["--config=tpu"]
+          ["--define=with_tpu_support=true"]
 
         _ ->
           []
       end
 
-    bazel_build_flags_cpu =
-      case target_triplet() do
-        {"aarch64", "darwin", _} -> ["--config=macos_arm64"]
-        _ -> []
-      end
-
     bazel_build_flags_shared = [
+      # Always use Clang
+      "--repo_env=CC=clang",
+      "--repo_env=CXX=clang++",
       # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
       "--copt=-Wno-error=unused-command-line-argument",
       # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
@@ -350,11 +347,7 @@ defmodule XLA do
       "--copt=-Wno-error=c23-extensions"
     ]
 
-    bazel_build_flags =
-      Enum.join(
-        bazel_build_flags_accelerator ++ bazel_build_flags_cpu ++ bazel_build_flags_shared,
-        " "
-      )
+    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 
     # Additional environment variables passed to make
     %{
