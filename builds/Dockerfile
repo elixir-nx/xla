@@ -7,7 +7,8 @@ FROM ${BASE_IMAGE} AS base-cpu
 
 FROM ${BASE_IMAGE} AS base-cuda
 
-# Now we use hermetic CUDA, so we no longer need to install it.
+# Now we use hermetic CUDA, so we no longer need to install it. We
+# leave this commented out for now, for reference.
 
 # ARG CUDA_VERSION
 # ARG CUDNN_VERSION

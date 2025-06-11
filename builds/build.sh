@@ -33,13 +33,8 @@ case "$target" in
   ;;
 
   "cuda12")
-    # TODO cleanup, also should we specify versions here rather than xla.ex
-    # docker build -t xla-cuda12 -f builds/Dockerfile \
-    #   --build-arg VARIANT=cuda \
-    #   --build-arg CUDA_VERSION=12-3 \
-    #   --build-arg CUDNN_VERSION=9.1.1.17 \
-    #   --build-arg XLA_TARGET=cuda12 \
-    #   .
+    # Note that the versions are configured with HERMETIC_CUDA_VERSION
+    # in lib/xla.ex.
     docker build -t xla-cuda12 -f builds/Dockerfile \
       --build-arg VARIANT=cuda \
       --build-arg XLA_TARGET=cuda12 \
