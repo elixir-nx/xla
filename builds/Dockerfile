@@ -7,20 +7,22 @@ FROM ${BASE_IMAGE} AS base-cpu
 
 FROM ${BASE_IMAGE} AS base-cuda
 
-ARG CUDA_VERSION
-ARG CUDNN_VERSION
+# Now we use hermetic CUDA, so we no longer need to install it.
 
-ARG DEBIAN_FRONTEND=noninteractive
+# ARG CUDA_VERSION
+# ARG CUDNN_VERSION
 
-RUN distro="ubuntu$(. /etc/lsb-release; echo "$DISTRIB_RELEASE" | tr -d '.')" && \
-  # Official Docker images use the sbsa packages when targetting arm64.
-  # See https://gitlab.com/nvidia/container-images/cuda/-/blob/85f465ea3343a2d7f7753a0a838701999ed58a01/dist/12.5.1/ubuntu2204/base/Dockerfile#L12
-  arch="$(if [ "$(uname -m)" = "aarch64" ]; then echo "sbsa"; else echo "x86_64"; fi)" && \
-  apt-get update && apt-get install -y ca-certificates wget && \
-  wget -qO /tmp/cuda-keyring.deb https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.1-1_all.deb && \
-  dpkg -i /tmp/cuda-keyring.deb && apt-get update && \
-  apt-get install -y git cuda-toolkit-${CUDA_VERSION} libcudnn9-cuda-12=${CUDNN_VERSION}-1 libcudnn9-dev-cuda-12=${CUDNN_VERSION}-1 && \
-  apt-get clean -y && rm -rf /var/lib/apt/lists/*
+# ARG DEBIAN_FRONTEND=noninteractive
+
+# RUN distro="ubuntu$(. /etc/lsb-release; echo "$DISTRIB_RELEASE" | tr -d '.')" && \
+#   # Official Docker images use the sbsa packages when targetting arm64.
+#   # See https://gitlab.com/nvidia/container-images/cuda/-/blob/85f465ea3343a2d7f7753a0a838701999ed58a01/dist/12.5.1/ubuntu2204/base/Dockerfile#L12
+#   arch="$(if [ "$(uname -m)" = "aarch64" ]; then echo "sbsa"; else echo "x86_64"; fi)" && \
+#   apt-get update && apt-get install -y ca-certificates wget && \
+#   wget -qO /tmp/cuda-keyring.deb https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.1-1_all.deb && \
+#   dpkg -i /tmp/cuda-keyring.deb && apt-get update && \
+#   apt-get install -y git cuda-toolkit-${CUDA_VERSION} libcudnn9-cuda-12=${CUDNN_VERSION}-1 libcudnn9-dev-cuda-12=${CUDNN_VERSION}-1 && \
+#   apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 FROM ${BASE_IMAGE} AS base-rocm
 

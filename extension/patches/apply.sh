@@ -10,3 +10,6 @@ if [[ $arch == 'aarch64' ]]; then
   git apply $dir/absl_workspace.patch
   cp $dir/absl_neon.patch third_party/tsl/third_party/absl
 fi
+
+# TODO elaborate
+git apply $dir/cuda_ncrtc_builtins.patch
