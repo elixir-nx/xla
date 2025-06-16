@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.9.0](https://github.com/elixir-nx/xla/tree/v0.9.0) (2025-06-16)
+
+### Changed
+
+* Bumped XLA version ([#111](https://github.com/elixir-nx/xla/pull/111))
+* CUDA build now requires Nvidia NCCL (`libnccl2`) to be installed
+* Compiling XLA from source now requires Clang instead of GCC
+
 ## [v0.8.0](https://github.com/elixir-nx/xla/tree/v0.8.0) (2024-08-17)
 
 ### Added
