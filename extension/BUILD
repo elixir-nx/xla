@@ -28,23 +28,26 @@ cc_binary(
     "//xla/stream_executor/host:host_platform",
     "//xla:literal",
     "//xla:shape_util",
-    "//xla:status",
-    "//xla:statusor",
+    "//xla/tsl/platform:status",
+    "//xla/tsl/platform:statusor",
+    "//xla/tsl/concurrency:async_value",
+    "@tsl//tsl/platform:platform_port",
+    "//xla/service:custom_call_target_registry",
+    "@llvm-project//llvm:config",
     "//xla:types",
     "//xla:util",
     "//xla/mlir/utils:error_util",
     "//xla/mlir_hlo",
     "//xla/mlir_hlo:all_passes",
     "//xla/pjrt:mlir_to_hlo",
-    "//xla/translate/hlo_to_mhlo:hlo_to_mlir_hlo",
-    "//xla/client:xla_computation",
-    "//xla/client/lib:lu_decomposition",
-    "//xla/client/lib:math",
-    "//xla/client/lib:qr",
-    "//xla/client/lib:svd",
-    "//xla/client/lib:self_adjoint_eig",
-    "//xla/client/lib:sorting",
-    "//xla/pjrt:interpreter_device",
+    "//xla/hlo/translate/hlo_to_mhlo:hlo_to_mlir_hlo",
+    "//xla/hlo/builder:xla_computation",
+    "//xla/hlo/builder/lib:lu_decomposition",
+    "//xla/hlo/builder/lib:math",
+    "//xla/hlo/builder/lib:qr",
+    "//xla/hlo/builder/lib:svd",
+    "//xla/hlo/builder/lib:self_adjoint_eig",
+    "//xla/hlo/builder/lib:sorting",
     "//xla/pjrt:pjrt_client",
     "//xla/pjrt:pjrt_compiler",
     "//xla/pjrt:tfrt_cpu_pjrt_client",
@@ -53,6 +56,8 @@ cc_binary(
     "//xla/pjrt/gpu:se_gpu_pjrt_client",
     "//xla/pjrt/distributed:client",
     "//xla/pjrt/distributed:service",
+    "//xla/service:metrics_proto_cc_impl",
+    "//xla/stream_executor/cuda:cuda_compute_capability_proto_cc_impl",
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
@@ -66,17 +71,19 @@ cc_binary(
     "@llvm-project//mlir:SparseTensorDialect",
     "@tsl//tsl/platform:errors",
     "@tsl//tsl/platform:fingerprint",
-    "@tsl//tsl/platform:ml_dtypes",
+    "@ml_dtypes_py//ml_dtypes:float8",
+    "@ml_dtypes_py//ml_dtypes:intn",
+    "@ml_dtypes_py//ml_dtypes:mxfloat",
     "@tsl//tsl/platform:statusor",
     "@tsl//tsl/platform:env_impl",
     "@tsl//tsl/platform:tensor_float_32_utils",
-    "@tsl//tsl/profiler/utils:time_utils_impl",
-    "@tsl//tsl/profiler/backends/cpu:annotation_stack_impl",
-    "@tsl//tsl/profiler/backends/cpu:traceme_recorder_impl",
-    "@tsl//tsl/protobuf:protos_all_cc_impl",
-    "@tsl//tsl/protobuf:dnn_proto_cc_impl",
-    "@tsl//tsl/framework:allocator",
-    "@tsl//tsl/framework:allocator_registry_impl",
+    "//xla/tsl/profiler/utils:time_utils_impl",
+    "//xla/tsl/profiler/backends/cpu:annotation_stack_impl",
+    "//xla/tsl/profiler/backends/cpu:traceme_recorder_impl",
+    "//xla/tsl/protobuf:protos_all_cc_impl",
+    "//xla/tsl/protobuf:dnn_proto_cc_impl",
+    "//xla/tsl/framework:allocator",
+    "//xla/tsl/framework:allocator_registry_impl",
     "//xla/tsl/util:determinism",
   ]
   # GRPC Dependencies (needed for PjRt distributed)
@@ -127,9 +134,9 @@ genrule(
   srcs = [
     ":xla_extension_dep_headers",
   ],
-  outs = ["include"],
+  outs = ["include.tar.gz"],
   cmd = """
-    mkdir $@
+    HEADERS_DIR=$$(mktemp -d)
     for f in $(SRCS); do
       d="$${f%/*}"
       d="$${d#bazel-out/*/genfiles/}"
@@ -162,12 +169,15 @@ genrule(
       # Remap ml_dtypes paths
       d="$${d/_virtual_includes\\/intn\\/ml_dtypes/ml_dtypes}"
       d="$${d/_virtual_includes\\/float8\\/ml_dtypes/ml_dtypes}"
-      mkdir -p "$@/$${d}"
-      cp "$${f}" "$@/$${d}/"
+      mkdir -p "$${HEADERS_DIR}/$${d}"
+      cp "$${f}" "$${HEADERS_DIR}/$${d}/"
     done
     # Files in xla/mlir_hlo include sibling headers from mhlo, so we
     # need to mirror them in includes
-    cp -r $@/xla/mlir_hlo/mhlo $@
+    cp -r $${HEADERS_DIR}/xla/mlir_hlo/mhlo $${HEADERS_DIR}
+    # Create the final tarball
+    tar czf "$@" -C $${HEADERS_DIR} .
+    rm -rf $${HEADERS_DIR}
     """,
   )
 
@@ -201,10 +211,12 @@ genrule(
   + if_with_tpu_support([
     ":libtpu_so"
   ]),
-  outs = ["lib"],
+  outs = ["lib.tar.gz"],
   cmd = """
-    mkdir $@
-    mv $(SRCS) $@
+    LIB_DIR=$$(mktemp -d)
+    mv $(SRCS) $${LIB_DIR}/
+    tar czf "$@" -C $${LIB_DIR} .
+    rm -rf $${LIB_DIR}
   """
 )
 
@@ -218,7 +230,13 @@ genrule(
   ],
   cmd = """
     mkdir xla_extension
-    cp -r $(SRCS) xla_extension
+    # Extract the lib tarball
+    mkdir xla_extension/lib
+    tar xzf $(location :xla_extension_lib) -C xla_extension/lib
+    # Extract the headers tarball
+    mkdir xla_extension/include
+    tar xzf $(location :xla_extension_headers) -C xla_extension/include
+    # Create the final package tarball
     tar czf "$@" xla_extension
   """
 )

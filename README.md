@@ -51,8 +51,8 @@ In addition to building in a local environment, you can build the ROCm binary us
 the Docker-based scripts in [`builds/`](https://github.com/elixir-nx/xla/tree/main/builds). You may want to adjust the ROCm
 version in `rocm.Dockerfile` accordingly.
 
-When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-5.7.0`
-and `LD_LIBRARY_PATH="/opt/rocm-5.7.0/lib"` (with your respective version). For further
+When you encounter errors at runtime, you may want to set `ROCM_PATH=/opt/rocm-6.0.0`
+and `LD_LIBRARY_PATH="/opt/rocm-6.0.0/lib"` (with your respective version). For further
 issues, feel free to open an issue.
 
 #### `XLA_BUILD`
@@ -93,29 +93,29 @@ Keep in mind that the compilation usually takes a very long time.
 You will need the following installed in your system for the compilation:
 
   * [Git](https://git-scm.com/) for fetching XLA source
-  * [Bazel v6.5.0](https://bazel.build/) for compiling XLA
+  * [Bazel v7.4.1](https://bazel.build/) for compiling XLA
+  * [Clang 18](https://clang.llvm.org/) for compiling XLA
   * [Python3](https://python.org) with NumPy installed for compiling XLA
 
 ### Common issues
 
 #### Bazel version
 
-Use `bazel --version` to check your Bazel version, make sure you are using v6.5.0.
+Use `bazel --version` to check your Bazel version, make sure you are using v7.4.1.
 Most binaries are available on [Github](https://github.com/bazelbuild/bazel/releases),
 but it can also be installed with `asdf`:
 
 ```shell
 asdf plugin-add bazel
-asdf install bazel 6.5.0
-asdf global bazel 6.5.0
+asdf install bazel 7.4.1
+asdf global bazel 7.4.1
 ```
 
-#### GCC
+#### Clang
 
-You may have issues with newer and older versions of GCC. XLA builds are known to work
-with GCC versions between 7.5 and 9.3. If your system uses a newer GCC version, you can
-install an older version and tell Bazel to use it with `export CC=/path/to/gcc-{version}`
-where version is the GCC version you installed.
+XLA builds are known to work with Clang 18. On macOS clang comes as part of Xcode SDK
+and the version may be older, though for macOS we have precompiled archives, so you
+most likely don't need to worry about it.
 
 #### Python and asdf
 
@@ -136,7 +136,7 @@ There are two known workarounds:
    `direnv` along with the `asdf-direnv` plugin will explicitly set the paths for any binary specified
    in your project's `.tool-versions` files.
 
-If you still get the error, you can also try setting `PYTHON_BIN_PATH`, like `export PYTHON_BIN_PATH=/usr/bin/python3.9`.
+If you still get the error, you can also try setting `PYTHON_BIN_PATH`, like `export PYTHON_BIN_PATH=/usr/bin/python3.11`.
 
 After doing any of the steps above, it may be necessary to clear the build cache by removing ` ~/.cache/xla_build`
 (or the corresponding OS-specific cache location).

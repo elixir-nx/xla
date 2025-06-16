@@ -312,7 +312,15 @@ defmodule XLA do
         "cuda" <> _ ->
           [
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
-            ~s/--config=cuda --action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/
+            "--config=cuda",
+            # XLA downloads and uses the configured hermetic versions.
+            ~s/--repo_env=HERMETIC_CUDA_VERSION="12.8.0"/,
+            ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
+            ~s/--action_env=HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/,
+            # See https://github.com/jax-ml/jax/blob/f2188786c225c7d16d8a7effd852470b2ad1b229/.bazelrc#L174-L176
+            # (by default Jax compiles CUDA code is compiled with NVCC, so we do the same)
+            ~s/--action_env=TF_NVCC_CLANG="1"/,
+            "--@local_config_cuda//:cuda_compiler=nvcc"
           ]
 
         "rocm" <> _ ->
@@ -320,23 +328,29 @@ defmodule XLA do
             "--config=rocm",
             "--action_env=HIP_PLATFORM=hcc",
             # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L128
-            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx1030,gfx1100"/
+            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx940,gfx941,gfx942,gfx1030,gfx1100,gfx1200,gfx1201"/
           ]
 
         "tpu" <> _ ->
-          ["--config=tpu"]
+          ["--define=with_tpu_support=true"]
 
         _ ->
           []
       end
 
-    bazel_build_flags_cpu =
-      case target_triplet() do
-        {"aarch64", "darwin", _} -> ["--config=macos_arm64"]
-        _ -> []
-      end
+    bazel_build_flags_shared = [
+      # Always use Clang
+      "--repo_env=CC=clang",
+      "--repo_env=CXX=clang++",
+      # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
+      "--copt=-Wno-error=unused-command-line-argument",
+      # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
+      "--copt=-Wno-gnu-offsetof-extensions",
+      "--copt=-Qunused-arguments",
+      "--copt=-Wno-error=c23-extensions"
+    ]
 
-    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_cpu, " ")
+    bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 
     # Additional environment variables passed to make
     %{
