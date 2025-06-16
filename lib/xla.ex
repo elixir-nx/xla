@@ -316,7 +316,7 @@ defmodule XLA do
             # XLA downloads and uses the configured hermetic versions.
             ~s/--repo_env=HERMETIC_CUDA_VERSION="12.8.0"/,
             ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
-            ~s/--action_env=TF_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,compute_90"/,
+            ~s/--action_env=HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/,
             # See https://github.com/jax-ml/jax/blob/f2188786c225c7d16d8a7effd852470b2ad1b229/.bazelrc#L174-L176
             # (by default Jax compiles CUDA code is compiled with NVCC, so we do the same)
             ~s/--action_env=TF_NVCC_CLANG="1"/,
