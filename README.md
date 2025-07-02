@@ -106,9 +106,9 @@ Most binaries are available on [Github](https://github.com/bazelbuild/bazel/rele
 but it can also be installed with `asdf`:
 
 ```shell
-asdf plugin-add bazel
+asdf plugin add bazel
 asdf install bazel 7.4.1
-asdf global bazel 7.4.1
+asdf set -u bazel 7.4.1
 ```
 
 #### Clang
