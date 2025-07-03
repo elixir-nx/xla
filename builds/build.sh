@@ -55,7 +55,7 @@ case "$target" in
 esac
 
 docker run --rm \
-  -v $(pwd)/builds/output/$target/build:/build \
+  -v $(pwd)/builds/output/$target/cache:/cache \
   -v $(pwd)/builds/output/$target/.cache:/root/.cache \
   $XLA_DOCKER_FLAGS \
   xla-$target
