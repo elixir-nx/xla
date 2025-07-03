@@ -4,13 +4,13 @@ set -ex
 
 cd "$(dirname "$0")/../.."
 
-ref="$1"
+sha="$1"
 release_name="$2"
 files="${@:3}"
 
 # Create the release, if not present.
 if ! gh release view $release_name; then
-  gh release create $release_name --title $release_name --draft --target $ref
+  gh release create $release_name --title $release_name --draft --target $sha
 fi
 
 # Uploading is the final action after several hour long build, so in
