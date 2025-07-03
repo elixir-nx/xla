@@ -21,5 +21,5 @@ tail -f build.log
 To see the built archives run:
 
 ```shell
-ls output/*/build/*/cache/build/*.tar.gz
+ls output/*/cache/*/build/*.tar.gz
 ```

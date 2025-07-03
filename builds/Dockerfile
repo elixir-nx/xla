@@ -1,5 +1,6 @@
 ARG VARIANT
-ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-jammy-20250404"
+# By default we build on Ubuntu 20 to compile against an older version of glibc.
+ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-focal-20240427"
 
 # Pre-stages for base image variants
 
@@ -82,7 +83,7 @@ WORKDIR /xla
 ARG XLA_TARGET
 
 ENV XLA_TARGET=${XLA_TARGET}
-ENV XLA_CACHE_DIR=/build
+ENV XLA_CACHE_DIR=/cache
 ENV XLA_BUILD=true
 
 COPY mix.exs mix.lock ./
