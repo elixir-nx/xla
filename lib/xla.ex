@@ -338,17 +338,27 @@ defmodule XLA do
           []
       end
 
-    bazel_build_flags_shared = [
-      # Always use Clang
-      "--repo_env=CC=clang",
-      "--repo_env=CXX=clang++",
-      # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
-      "--copt=-Wno-error=unused-command-line-argument",
-      # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
-      "--copt=-Wno-gnu-offsetof-extensions",
-      "--copt=-Qunused-arguments",
-      "--copt=-Wno-error=c23-extensions"
-    ]
+    # For ROCm, the toolchain uses GCC for some targets, so we can't use Clang-specific flags
+    # Also need to disable system headers check due to ROCm toolchain using absolute paths
+    bazel_build_flags_shared = if System.get_env("XLA_TARGET") == "rocm" do
+      [
+        "--repo_env=CC=clang",
+        "--repo_env=CXX=clang++",
+        "--features=-supports_system_headers"
+      ]
+    else
+      [
+        # Always use Clang
+        "--repo_env=CC=clang",
+        "--repo_env=CXX=clang++",
+        # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
+        "--copt=-Wno-error=unused-command-line-argument",
+        # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
+        "--copt=-Wno-gnu-offsetof-extensions",
+        "--copt=-Qunused-arguments",
+        "--copt=-Wno-error=c23-extensions"
+      ]
+    end
 
     bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 

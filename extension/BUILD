@@ -2,7 +2,6 @@ load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("//xla/tsl:tsl.bzl", "if_with_tpu_support")
-load("//xla/tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
 load("//xla/tsl:tsl.bzl", "transitive_hdrs",)
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
@@ -85,9 +84,9 @@ cc_binary(
     "//xla/tsl/framework:allocator",
     "//xla/tsl/framework:allocator_registry_impl",
     "//xla/tsl/util:determinism",
+    # GRPC Dependencies (needed for PjRt distributed)
+    "@com_github_grpc_grpc//:grpc++",
   ]
-  # GRPC Dependencies (needed for PjRt distributed)
-  + tsl_grpc_cc_dependencies()
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",
   ])
