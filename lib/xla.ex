@@ -327,8 +327,10 @@ defmodule XLA do
           [
             "--config=rocm",
             "--action_env=HIP_PLATFORM=hcc",
-            # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L128
-            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx900,gfx906,gfx908,gfx90a,gfx940,gfx941,gfx942,gfx1030,gfx1100,gfx1200,gfx1201"/
+            # GPU targets: MI200 (gfx90a), MI300 (gfx942), RDNA2 (gfx1030), RDNA3 (gfx1100), RDNA4 (gfx120x)
+            # Note: gfx900/906/908 (Vega, MI50/60, MI100) removed - deprecated in ROCm 7.x
+            # Note: gfx940/941 removed - not valid LLVM targets, MI300 uses gfx942
+            ~s/--action_env=TF_ROCM_AMDGPU_TARGETS="gfx90a,gfx942,gfx1030,gfx1100,gfx1200,gfx1201"/
           ]
 
         "tpu" <> _ ->
@@ -340,7 +342,7 @@ defmodule XLA do
 
     # For ROCm, the toolchain uses GCC for some targets, so we can't use Clang-specific flags
     # Also need to disable system headers check due to ROCm toolchain using absolute paths
-    bazel_build_flags_shared = if System.get_env("XLA_TARGET") == "rocm" do
+    bazel_build_flags_shared = if xla_target() == "rocm" do
       [
         "--repo_env=CC=clang",
         "--repo_env=CXX=clang++",

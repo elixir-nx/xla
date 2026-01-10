@@ -1,6 +1,7 @@
 ARG VARIANT
-# Use Ubuntu 22.04 for ROCm 6.x compatibility and modern GCC with instruction set support
-ARG BASE_IMAGE="docker.io/hexpm/elixir:1.18-erlang-28.3-ubuntu-jammy-20251013"
+
+# Base image: Ubuntu 20.04 for older glibc compatibility
+ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-focal-20240427"
 
 # Pre-stages for base image variants
 
@@ -32,10 +33,8 @@ ARG ROCM_VERSION
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install GCC 11 for ROCm toolchain compatibility
-RUN apt-get update && apt-get install -y gcc-11 g++-11 cpp-11 && \
-  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 && \
-  apt-get clean -y && rm -rf /var/lib/apt/lists/*
+# Use Clang for ROCm toolchain instead of GCC
+ENV TF_ROCM_CLANG="1"
 
 # Install ROCm
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
