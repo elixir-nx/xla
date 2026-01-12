@@ -341,8 +341,7 @@ defmodule XLA do
           []
       end
 
-    # For ROCm, the toolchain uses GCC for some targets, so we can't use Clang-specific flags
-    # Also need to disable system headers check due to ROCm toolchain using absolute paths
+    # For ROCm, disable system headers check due to ROCm toolchain using absolute paths
     bazel_build_flags_shared = if xla_target() == "rocm" do
       [
         "--repo_env=CC=clang",

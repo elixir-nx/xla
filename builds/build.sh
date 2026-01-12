@@ -55,6 +55,8 @@ case "$target" in
   ;;
 
   "rocm")
+    # ROCm 6.2+ required: OpenXLA depends on rocprofiler-sdk (introduced in ROCm 6.2)
+    # See https://github.com/openxla/xla/blob/main/third_party/gpus/rocm_configure.bzl
     rocm_ver="${ROCM_VERSION:-6.3}"
     rocm_major="${rocm_ver%%.*}"
     # Use version-specific output directory and image tag

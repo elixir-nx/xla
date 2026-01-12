@@ -9,7 +9,7 @@ env:
   NX_XLA_RELEASE_NAME: ${{ github.ref_name }}
 
   # Build envs for non-Docker jobs.
-  USE_BAZEL_VERSION: 7.4.1
+  USE_BAZEL_VERSION: 7.7.0
   XLA_BUILD: true
   XLA_CACHE_DIR: tmp/cache
 
