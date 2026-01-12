@@ -327,6 +327,7 @@ defmodule XLA do
           [
             "--config=rocm",
             "--action_env=HIP_PLATFORM=hcc",
+            # See https://github.com/jax-ml/jax/blob/098e953afb2b83daf85e6456c89e896f9cfd483d/.bazelrc#L239
             # GPU targets: MI200 (gfx90a), MI300 (gfx942), RDNA2 (gfx1030), RDNA3 (gfx1100), RDNA4 (gfx120x)
             # Note: gfx900/906/908 (Vega, MI50/60, MI100) removed - deprecated in ROCm 7.x
             # Note: gfx940/941 removed - not valid LLVM targets, MI300 uses gfx942
