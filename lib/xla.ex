@@ -364,6 +364,10 @@ defmodule XLA do
         ]
     end
 
+    # We need to set HOME for the build, otherwise one of the scripts
+    # during the build fails, at least on macOS.
+    bazel_build_flags_shared = ["--action_env=HOME='#{System.get_env("HOME")}'"] ++ bazel_build_flags_shared
+
     bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 
     # Additional environment variables passed to make

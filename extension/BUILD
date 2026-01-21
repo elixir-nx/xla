@@ -60,6 +60,7 @@ cc_binary(
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
+    "@com_google_absl//absl/log:initialize",
     "@com_google_protobuf//:protobuf",
     "@llvm-project//llvm:Support",
     "@llvm-project//mlir:FuncDialect",
