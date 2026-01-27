@@ -7,6 +7,9 @@ Precompiled [XLA](https://github.com/openxla/xla) binaries for [EXLA](https://gi
 Currently supports UNIX systems, including macOS (although no built-in support for Apple Metal).
 Windows platforms are only supported upstream via [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux).
 
+The dynamic library contains a subset of XLA (relevant for EXLA), as well as a number of
+globally registered custom calls (see [extension/custom_calls](extension/custom_calls)).
+
 ## Usage
 
 EXLA already depends on this package, so you generally don't need to install it yourself.
