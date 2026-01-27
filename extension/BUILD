@@ -8,10 +8,25 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 package(default_visibility=["//visibility:private"])
 
+# Custom CPU calls for linear algebra operations (eigh, lu, qr)
+cc_library(
+  name = "custom_calls",
+  srcs = glob(["custom_calls/*.cc"]),
+  hdrs = glob(["custom_calls/*.h"]),
+  deps = [
+    "//xla/ffi/api:ffi",
+    "//xla/ffi:ffi_api",
+    "//xla/tsl/platform:types",
+    "@eigen_archive//:eigen3",
+  ],
+  alwayslink = 1,
+)
+
 # Shared library which contains the subset of XLA required for EXLA
 cc_binary(
   name = "libxla_extension.so",
   deps = [
+    ":custom_calls",
     "//xla:xla_proto_cc_impl",
     "//xla:xla_data_proto_cc_impl",
     "//xla:autotune_results_proto_cc_impl",
