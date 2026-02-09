@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - jk-build-test
 
 env:
   NX_XLA_SHA: ${{ github.sha }}
@@ -24,9 +26,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cpu
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   linux-cuda12:
     name: "x86_64-linux-gnu-cuda12"
@@ -38,9 +40,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cuda12
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   linux-cuda13:
     name: "x86_64-linux-gnu-cuda13"
@@ -52,9 +54,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cuda13
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   linux-tpu:
     name: "x86_64-linux-gnu-tpu"
@@ -66,9 +68,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh tpu
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   linux-arm-cpu:
     name: "aarch64-linux-gnu-cpu"
@@ -80,9 +82,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cpu
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   linux-arm-cuda:
     name: "aarch64-linux-gnu-cuda12"
@@ -94,9 +96,9 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cuda12
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   macos:
     name: "x86_64-darwin-cpu"
@@ -125,9 +127,9 @@ jobs:
           # this flag is not passed in the first place.
           # See https://github.com/tensorflow/tensorflow/pull/87514
           BUILD_FLAGS: "--define=xnn_enable_avxvnniint8=false"
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   macos-arm:
     name: "aarch64-darwin-cpu"
@@ -149,6 +151,6 @@ jobs:
       - run: mix compile
         env:
           XLA_TARGET: cpu
-      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
