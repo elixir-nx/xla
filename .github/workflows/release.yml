@@ -132,6 +132,8 @@ jobs:
       # Xcode, ignoring whichever version we installed ourselves, therefore we
       # explicitly pick Xcode version from the available ones.
       - run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      # On x86_64 the build depends on onednn.
+      - run: brew install onednn
       - uses: bazel-contrib/setup-bazel@0.14.0
       - uses: actions/setup-python@v5
         with:
@@ -146,32 +148,32 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  macos-arm:
-    name: "aarch64-darwin-cpu"
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: brew install elixir
-      - run: mix local.hex --force
-      # Setup the compilation environment
-      #
-      # We could install a newer Clang specifically, however at some point bazel
-      # toolchains invoke xcrun clang, which always uses the system version from
-      # Xcode, ignoring whichever version we installed ourselves, therefore we
-      # explicitly pick Xcode version from the available ones.
-      - run: sudo xcode-select -s /Applications/Xcode_16.2.app
-      - uses: bazel-contrib/setup-bazel@0.14.0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: python -m pip install --upgrade pip numpy
-      # Build and upload the archive
-      - run: mix deps.get
-      - run: mix compile
-        env:
-          XLA_TARGET: cpu
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # macos-arm:
+  #   name: "aarch64-darwin-cpu"
+  #   runs-on: macos-14
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: brew install elixir
+  #     - run: mix local.hex --force
+  #     # Setup the compilation environment
+  #     #
+  #     # We could install a newer Clang specifically, however at some point bazel
+  #     # toolchains invoke xcrun clang, which always uses the system version from
+  #     # Xcode, ignoring whichever version we installed ourselves, therefore we
+  #     # explicitly pick Xcode version from the available ones.
+  #     - run: sudo xcode-select -s /Applications/Xcode_16.2.app
+  #     - uses: bazel-contrib/setup-bazel@0.14.0
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.11"
+  #     - run: python -m pip install --upgrade pip numpy
+  #     # Build and upload the archive
+  #     - run: mix deps.get
+  #     - run: mix compile
+  #       env:
+  #         XLA_TARGET: cpu
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
