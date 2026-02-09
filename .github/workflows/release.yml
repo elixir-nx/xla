@@ -132,8 +132,6 @@ jobs:
       # Xcode, ignoring whichever version we installed ourselves, therefore we
       # explicitly pick Xcode version from the available ones.
       - run: sudo xcode-select -s /Applications/Xcode_16.2.app
-      # On x86_64 the build depends on onednn.
-      - run: brew install onednn
       - uses: bazel-contrib/setup-bazel@0.14.0
       - uses: actions/setup-python@v5
         with:
@@ -144,6 +142,11 @@ jobs:
       - run: mix compile
         env:
           XLA_TARGET: cpu
+          # On x86_64 macos the build depends on onednn for certain kernels.
+          # Installing onednn with brew doesn't work, so for now the simplest
+          # solution is to disable it, given that this x86_64 macos is not
+          # a very common target at this point.
+          BUILD_FLAGS: "--define=tensorflow_mkldnn_contraction_kernel=0"
       # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} tmp/cache/*/build/*
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
