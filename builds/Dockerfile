@@ -1,5 +1,6 @@
 ARG VARIANT
-# By default we build on Ubuntu 20 to compile against an older version of glibc.
+
+# Base image: Ubuntu 20.04 for older glibc compatibility
 ARG BASE_IMAGE="hexpm/elixir:1.15.8-erlang-24.3.4.17-ubuntu-focal-20240427"
 
 # Pre-stages for base image variants
@@ -32,6 +33,7 @@ ARG ROCM_VERSION
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Install ROCm
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
   distro="$(. /etc/lsb-release && echo "$DISTRIB_CODENAME")" && \
   curl -sL https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add - && \
@@ -41,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
   apt-get install -y rocm-dev rocm-libs && \
   apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-ENV ROCM_PATH "/opt/rocm-${ROCM_VERSION}.0"
+ENV ROCM_PATH "/opt/rocm"
 
 FROM base-${VARIANT}
 
@@ -54,7 +56,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # We need to install "add-apt-repository" first
 RUN apt-get update && \
   # Install basic system dependencies
-  apt-get update && apt-get install -y ca-certificates curl git unzip wget && \
+  apt-get update && apt-get install -y ca-certificates curl git unzip wget xxd && \
   # Install Clang
   clang_version="18" && \
   apt-get install -y wget gnupg software-properties-common lsb-release && \
@@ -68,7 +70,7 @@ RUN wget -O bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.2
   chmod +x bazel && \
   mv bazel /usr/local/bin/bazel
 
-ENV USE_BAZEL_VERSION=7.4.1
+ENV USE_BAZEL_VERSION=7.7.0
 
 # Install Python and the necessary global dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip && \

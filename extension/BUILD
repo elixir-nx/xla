@@ -2,17 +2,31 @@ load("//xla/stream_executor:build_defs.bzl", "if_cuda_or_rocm",)
 load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("//xla/tsl:tsl.bzl", "if_with_tpu_support")
-load("//xla/tsl:tsl.bzl", "tsl_grpc_cc_dependencies",)
 load("//xla/tsl:tsl.bzl", "transitive_hdrs",)
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 package(default_visibility=["//visibility:private"])
 
+# Custom CPU calls for linear algebra operations (eigh, lu, qr)
+cc_library(
+  name = "custom_calls",
+  srcs = glob(["custom_calls/*.cc"]),
+  hdrs = glob(["custom_calls/*.h"]),
+  deps = [
+    "//xla/ffi/api:ffi",
+    "//xla/ffi:ffi_api",
+    "//xla/tsl/platform:types",
+    "@eigen_archive//:eigen3",
+  ],
+  alwayslink = 1,
+)
+
 # Shared library which contains the subset of XLA required for EXLA
 cc_binary(
   name = "libxla_extension.so",
   deps = [
+    ":custom_calls",
     "//xla:xla_proto_cc_impl",
     "//xla:xla_data_proto_cc_impl",
     "//xla:autotune_results_proto_cc_impl",
@@ -61,6 +75,7 @@ cc_binary(
     "@com_google_absl//absl/types:span",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/base:log_severity",
+    "@com_google_absl//absl/log:initialize",
     "@com_google_protobuf//:protobuf",
     "@llvm-project//llvm:Support",
     "@llvm-project//mlir:FuncDialect",
@@ -85,9 +100,9 @@ cc_binary(
     "//xla/tsl/framework:allocator",
     "//xla/tsl/framework:allocator_registry_impl",
     "//xla/tsl/util:determinism",
+    # GRPC Dependencies (needed for PjRt distributed)
+    "@com_github_grpc_grpc//:grpc++",
   ]
-  # GRPC Dependencies (needed for PjRt distributed)
-  + tsl_grpc_cc_dependencies()
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",
   ])
