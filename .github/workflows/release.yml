@@ -16,103 +16,103 @@ env:
   XLA_CACHE_DIR: tmp/cache
 
 jobs:
-  linux-cpu:
-    name: "x86_64-linux-gnu-cpu"
-    runs-on: ubuntu-24.04
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cpu
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-cpu:
+  #   name: "x86_64-linux-gnu-cpu"
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cpu
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-cuda12:
-    name: "x86_64-linux-gnu-cuda12"
-    runs-on: ubuntu-24.04
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cuda12
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-cuda12:
+  #   name: "x86_64-linux-gnu-cuda12"
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cuda12
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-cuda13:
-    name: "x86_64-linux-gnu-cuda13"
-    runs-on: ubuntu-24.04
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cuda13
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-cuda13:
+  #   name: "x86_64-linux-gnu-cuda13"
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cuda13
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-tpu:
-    name: "x86_64-linux-gnu-tpu"
-    runs-on: ubuntu-24.04
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh tpu
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-tpu:
+  #   name: "x86_64-linux-gnu-tpu"
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh tpu
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-arm-cpu:
-    name: "aarch64-linux-gnu-cpu"
-    runs-on: ubuntu-24.04-arm
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cpu
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-arm-cpu:
+  #   name: "aarch64-linux-gnu-cpu"
+  #   runs-on: ubuntu-24.04-arm
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cpu
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-arm-cuda12:
-    name: "aarch64-linux-gnu-cuda12"
-    runs-on: ubuntu-24.04-arm
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cuda12
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-arm-cuda12:
+  #   name: "aarch64-linux-gnu-cuda12"
+  #   runs-on: ubuntu-24.04-arm
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cuda12
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-arm-cuda13:
-    name: "aarch64-linux-gnu-cuda13"
-    runs-on: ubuntu-24.04-arm
-    steps:
-      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
-      - run: rm -rf /opt/hostedtoolcache
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.NX_XLA_SHA }}
-      - run: builds/build.sh cuda13
-      # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # linux-arm-cuda13:
+  #   name: "aarch64-linux-gnu-cuda13"
+  #   runs-on: ubuntu-24.04-arm
+  #   steps:
+  #     # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+  #     - run: rm -rf /opt/hostedtoolcache
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ env.NX_XLA_SHA }}
+  #     - run: builds/build.sh cuda13
+  #     # - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   macos:
     name: "x86_64-darwin-cpu"
