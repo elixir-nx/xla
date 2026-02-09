@@ -326,7 +326,8 @@ defmodule XLA do
         "rocm" <> _ ->
           [
             "--config=rocm",
-            "--action_env=HIP_PLATFORM=hcc",
+            ~s/--action_env=TF_ROCM_CLANG="1"/,
+            ~s/--action_env=TF_HIPCC_CLANG="1"/,
             # See https://github.com/jax-ml/jax/blob/098e953afb2b83daf85e6456c89e896f9cfd483d/.bazelrc#L239
             # GPU targets: MI200 (gfx90a), MI300 (gfx942), RDNA2 (gfx1030), RDNA3 (gfx1100), RDNA4 (gfx120x)
             # Note: gfx900/906/908 (Vega, MI50/60, MI100) removed - deprecated in ROCm 7.x
@@ -341,32 +342,22 @@ defmodule XLA do
           []
       end
 
-    # For ROCm, disable system headers check due to ROCm toolchain using absolute paths
-    bazel_build_flags_shared = case xla_target() do
-      "rocm" <> _ ->
-        [
-          "--repo_env=CC=clang",
-          "--repo_env=CXX=clang++",
-          "--features=-supports_system_headers"
-        ]
-
-      _ ->
-        [
-          # Always use Clang
-          "--repo_env=CC=clang",
-          "--repo_env=CXX=clang++",
-          # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
-          "--copt=-Wno-error=unused-command-line-argument",
-          # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
-          "--copt=-Wno-gnu-offsetof-extensions",
-          "--copt=-Qunused-arguments",
-          "--copt=-Wno-error=c23-extensions"
-        ]
-    end
+    bazel_build_flags_shared = [
+      # Always use Clang
+      "--repo_env=CC=clang",
+      "--repo_env=CXX=clang++",
+      # See https://github.com/tensorflow/tensorflow/issues/62459#issuecomment-2043942557
+      "--copt=-Wno-error=unused-command-line-argument",
+      # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
+      "--copt=-Wno-gnu-offsetof-extensions",
+      "--copt=-Qunused-arguments",
+      "--copt=-Wno-error=c23-extensions"
+    ]
 
     # We need to set HOME for the build, otherwise one of the scripts
     # during the build fails, at least on macOS.
-    bazel_build_flags_shared = ["--action_env=HOME='#{System.get_env("HOME")}'"] ++ bazel_build_flags_shared
+    bazel_build_flags_shared =
+      ["--action_env=HOME='#{System.get_env("HOME")}'"] ++ bazel_build_flags_shared
 
     bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 

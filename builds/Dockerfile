@@ -33,9 +33,6 @@ ARG ROCM_VERSION
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Use Clang for ROCm toolchain instead of GCC
-ENV TF_ROCM_CLANG="1"
-
 # Install ROCm
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
   distro="$(. /etc/lsb-release && echo "$DISTRIB_CODENAME")" && \
