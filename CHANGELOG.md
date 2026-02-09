@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.10.0](https://github.com/elixir-nx/xla/tree/v0.10.0) (2026-02-10)
+
+### Added
+
+* CUDA 13 support
+* Custom call definitions to the build archive, extracted from EXLA
+
+### Changed
+
+* CUDA build now requires Nvidia NVSHMEM (`libnvshmem3`) to be installed
+* Bumped runtime library requirements for CUDA 12
+
 ## [v0.9.1](https://github.com/elixir-nx/xla/tree/v0.9.1) (2025-07-03)
 
 ### Changed
