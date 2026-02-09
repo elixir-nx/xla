@@ -25,13 +25,14 @@ need to export it in every shell session.
 The default value is usually `cpu`, which implies the final the binary supports targeting
 only the host CPU. If a matching CUDA version is detected, the target is set to CUDA accordingly.
 
-| Value | Target environment |
-| --- | --- |
-| cpu | |
-| tpu | libtpu |
-| cuda12 | CUDA >= 12.1, cuDNN >= 9.1 and < 10.0 |
-| cuda | CUDA x.y, cuDNN (building from source only) |
-| rocm | ROCm (building from source only) |
+| Value  | Target environment                                                   |
+| ------ | -------------------------------------------------------------------- |
+| cpu    |                                                                      |
+| tpu    | libtpu                                                               |
+| cuda12 | CUDA >= 12.1, cuDNN >= 9.8 and < 10.0, NCCL >= 2.27, NVSHMEM >= 3.3  |
+| cuda13 | CUDA >= 13.0, cuDNN >= 9.12 and < 10.0, NCCL >= 2.27, NVSHMEM >= 3.3 |
+| cuda   | CUDA x.y, cuDNN (building from source only)                          |
+| rocm   | ROCm (building from source only)                                     |
 
 To use XLA with NVidia GPU you need [CUDA](https://developer.nvidia.com/cuda-downloads)
 and [cuDNN](https://developer.nvidia.com/cudnn) compatible with your GPU drivers.
@@ -63,7 +64,7 @@ issues, feel free to open an issue.
 Defaults to `false`. If `true` the binary is built locally, which may be intended
 if no precompiled binary is available for your target environment. Once set, you
 must run `mix deps.clean xla --build` explicitly to force XLA to recompile.
-Building has a number of dependencies, see *Building from source* below.
+Building has a number of dependencies, see _Building from source_ below.
 
 #### `XLA_ARCHIVE_URL`
 
@@ -95,10 +96,10 @@ Keep in mind that the compilation usually takes a very long time.
 
 You will need the following installed in your system for the compilation:
 
-  * [Git](https://git-scm.com/) for fetching XLA source
-  * [Bazel v7.7.0](https://bazel.build/) for compiling XLA
-  * [Clang 18](https://clang.llvm.org/) for compiling XLA
-  * [Python3](https://python.org) with NumPy installed for compiling XLA
+- [Git](https://git-scm.com/) for fetching XLA source
+- [Bazel v7.7.0](https://bazel.build/) for compiling XLA
+- [Clang 18](https://clang.llvm.org/) for compiling XLA
+- [Python3](https://python.org) with NumPy installed for compiling XLA
 
 ### Common issues
 
@@ -130,10 +131,10 @@ There are two known workarounds:
 1. Explicitly change your `$PATH` to point to a Python installation (note the build process
    looks for `python`, not `python3`). For example:
 
-    ```shell
-    # Point directly to a specific Python version
-    export PATH=$HOME/.asdf/installs/python/3.10.8/bin:$PATH
-    ```
+   ```shell
+   # Point directly to a specific Python version
+   export PATH=$HOME/.asdf/installs/python/3.10.8/bin:$PATH
+   ```
 
 2. Use the [`asdf direnv`](https://github.com/asdf-community/asdf-direnv) plugin to install [`direnv 2.20.0`](https://direnv.net).
    `direnv` along with the `asdf-direnv` plugin will explicitly set the paths for any binary specified
@@ -158,11 +159,11 @@ All you need is setting `XLA_TARGET=tpu`.
 
 You can use the following env vars to customize your build:
 
-  * `BUILD_CACHE` - controls where to store XLA source and builds
+- `BUILD_CACHE` - controls where to store XLA source and builds
 
-  * `BUILD_FLAGS` - additional flags passed to Bazel
+- `BUILD_FLAGS` - additional flags passed to Bazel
 
-  * `BUILD_MODE` - controls to compile `opt` (default) artifacts or `dbg`, example: `BUILD_MODE=dbg`
+- `BUILD_MODE` - controls to compile `opt` (default) artifacts or `dbg`, example: `BUILD_MODE=dbg`
 
 ## Runtime flags
 

@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  linux-cuda:
+  linux-cuda12:
     name: "x86_64-linux-gnu-cuda12"
     runs-on: ubuntu-24.04
     steps:
@@ -38,6 +38,20 @@ jobs:
         with:
           ref: ${{ env.NX_XLA_SHA }}
       - run: builds/build.sh cuda12
+      - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  linux-cuda13:
+    name: "x86_64-linux-gnu-cuda13"
+    runs-on: ubuntu-24.04
+    steps:
+      # Free up space, see https://github.com/orgs/community/discussions/25678#discussioncomment-5242449
+      - run: rm -rf /opt/hostedtoolcache
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.NX_XLA_SHA }}
+      - run: builds/build.sh cuda13
       - run: .github/scripts/upload_artifact.sh ${{ env.NX_XLA_SHA }} ${{ env.NX_XLA_RELEASE_NAME }} builds/output/*/cache/*/build/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

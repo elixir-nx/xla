@@ -21,10 +21,12 @@ defmodule XLA do
     "aarch64-linux-gnu-cpu",
     "x86_64-linux-gnu-cuda12",
     "aarch64-linux-gnu-cuda12",
+    "x86_64-linux-gnu-cuda13",
+    "aarch64-linux-gnu-cuda13",
     "x86_64-linux-gnu-tpu"
   ]
 
-  @supported_xla_targets ["cpu", "cuda", "rocm", "tpu", "cuda12"]
+  @supported_xla_targets ["cpu", "cuda", "rocm", "tpu", "cuda12", "cuda13"]
 
   @doc """
   Returns path to the precompiled XLA archive.
@@ -88,7 +90,11 @@ defmodule XLA do
   defp infer_xla_target() do
     with nvcc when nvcc != nil <- System.find_executable("nvcc"),
          {output, 0} <- System.cmd(nvcc, ["--version"]) do
-      if output =~ "release 12.", do: "cuda12"
+      cond do
+        output =~ "release 12." -> "cuda12"
+        output =~ "release 13." -> "cuda13"
+        true -> nil
+      end
     else
       _ -> nil
     end
@@ -309,19 +315,43 @@ defmodule XLA do
   def make_env() do
     bazel_build_flags_accelerator =
       case xla_target() do
-        "cuda" <> _ ->
-          [
-            # See https://github.com/google/jax/blob/66a92c41f6bac74960159645158e8d932ca56613/.bazelrc#L68
-            "--config=cuda",
-            # XLA downloads and uses the configured hermetic versions.
-            ~s/--repo_env=HERMETIC_CUDA_VERSION="12.8.0"/,
-            ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
-            ~s/--action_env=HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/,
-            # See https://github.com/jax-ml/jax/blob/f2188786c225c7d16d8a7effd852470b2ad1b229/.bazelrc#L174-L176
-            # (by default Jax compiles CUDA code is compiled with NVCC, so we do the same)
-            ~s/--action_env=TF_NVCC_CLANG="1"/,
-            "--@local_config_cuda//:cuda_compiler=nvcc"
-          ]
+        "cuda" <> _ = target ->
+          # See https://github.com/jax-ml/jax/blob/83e8cf58e1c6b0588b7203bb2b240f99ca8576b4/.bazelrc#L177
+
+          shared =
+            [
+              "--config=cuda",
+              # See https://github.com/jax-ml/jax/blob/83e8cf58e1c6b0588b7203bb2b240f99ca8576b4/.bazelrc#L228-L230
+              # (by default Jax compiles CUDA code with NVCC, so we do the same)
+              ~s/--action_env=TF_NVCC_CLANG="1"/,
+              "--@local_config_cuda//:cuda_compiler=nvcc"
+            ]
+
+          shared ++
+            case target do
+              "cuda12" ->
+                [
+                  # XLA downloads and uses the configured hermetic versions.
+                  ~s/--repo_env=HERMETIC_CUDA_VERSION="12.9.1"/,
+                  ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
+                  ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.9"/,
+                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
+                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/
+                ]
+
+              "cuda13" ->
+                [
+                  # XLA downloads and uses the configured hermetic versions.
+                  ~s/--repo_env=HERMETIC_CUDA_VERSION="13.0.0"/,
+                  ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.12.0"/,
+                  ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.20"/,
+                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
+                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_75,sm_80,sm_90,sm_100,compute_120"/
+                ]
+
+              "cuda" ->
+                []
+            end
 
         "rocm" <> _ ->
           [
