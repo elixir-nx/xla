@@ -336,7 +336,7 @@ defmodule XLA do
                   ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
                   ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.9"/,
                   ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
-                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/
+                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,sm_120,compute_120"/
                 ]
 
               "cuda13" ->
@@ -346,7 +346,7 @@ defmodule XLA do
                   ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.12.0"/,
                   ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.20"/,
                   ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
-                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_75,sm_80,sm_90,sm_100,compute_120"/
+                  ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_75,sm_80,sm_90,sm_100,sm_120,compute_120"/
                 ]
 
               "cuda" ->
