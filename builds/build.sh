@@ -71,6 +71,7 @@ case "$target" in
       --build-arg BASE_IMAGE=$base_image \
       --build-arg ROCM_VERSION=$rocm_ver \
       --build-arg XLA_TARGET=rocm \
+      --network host \
       .
   ;;
 

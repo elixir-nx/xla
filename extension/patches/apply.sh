@@ -21,3 +21,14 @@ arch="$(uname -m)"
 # See https://github.com/tensorflow/tensorflow/pull/86413 and the
 # referenced threads.
 git apply $dir/cuda_ncrtc_builtins.patch
+
+# When building XLA with ROCm, the compiler resolves symlinks in the
+# local_config_rocm repository and reports include paths at the real
+# absolute location (e.g. /opt/rocm/llvm/lib/clang/22/include)
+# rather than the symlinked bazel-cache path. Bazel's header
+# validation rejects these as "absolute path inclusions" unless they
+# are listed in cxx_builtin_include_directories. This patch adds
+# the absolute resource directory paths alongside the relative ones.
+if [[ -n "${XLA_TARGET:-}" && "${XLA_TARGET}" == "rocm" ]]; then
+  git apply $dir/rocm_absolute_includes.patch
+fi
