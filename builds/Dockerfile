@@ -45,6 +45,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 ENV ROCM_PATH "/opt/rocm"
 
+# Pass repo_env flags so that rocm_configure repository rule can see
+# them when generating the crosstool wrapper. Without these, the
+# wrapper defaults to gcc and fails on Clang-only flags.
+ENV TF_ROCM_CLANG="1"
+ENV CLANG_COMPILER_PATH="/usr/lib/llvm-18/bin/clang"
+
 FROM base-${VARIANT}
 
 # Set the missing UTF-8 locale, otherwise Elixir warns
