@@ -3,8 +3,6 @@ load("@local_config_cuda//cuda:build_defs.bzl", "if_cuda",)
 load("@local_config_rocm//rocm:build_defs.bzl", "if_rocm",)
 load("//xla/tsl:tsl.bzl", "if_with_tpu_support")
 load("//xla/tsl:tsl.bzl", "transitive_hdrs",)
-load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 package(default_visibility=["//visibility:private"])
 
@@ -101,7 +99,7 @@ cc_binary(
     "//xla/tsl/framework:allocator_registry_impl",
     "//xla/tsl/util:determinism",
     # GRPC Dependencies (needed for PjRt distributed)
-    "@com_github_grpc_grpc//:grpc++",
+    "@grpc//:grpc++",
   ]
   + if_cuda_or_rocm([
     "//xla/service:gpu_plugin",
@@ -165,7 +163,7 @@ genrule(
         if [[ $${TF_SYSTEM_LIBS:-} == *$${extname}* ]]; then
           continue
         fi
-        d="$${d#*external/farmhash_archive/src}"
+        d="$${d#*external/*farmhash_archive/src}"
         d="$${d#*external/$${extname}/}"
       fi
       # Remap third party paths
@@ -190,6 +188,11 @@ genrule(
     # Files in xla/mlir_hlo include sibling headers from mhlo, so we
     # need to mirror them in includes
     cp -r $${HEADERS_DIR}/xla/mlir_hlo/mhlo $${HEADERS_DIR}
+    # LLVM sets LLVM_ENABLE_THREADS through Bazel defines, so the config
+    # header only has a comment. Define it for consumers outside Bazel
+    sed 's|/[*] LLVM_ENABLE_THREADS defined in Bazel [*]/|#define LLVM_ENABLE_THREADS 1|' \
+      $${HEADERS_DIR}/llvm/Config/llvm-config.h > $${HEADERS_DIR}/llvm-config.h.tmp
+    mv $${HEADERS_DIR}/llvm-config.h.tmp $${HEADERS_DIR}/llvm/Config/llvm-config.h
     # Create the final tarball
     tar czf "$@" -C $${HEADERS_DIR} .
     rm -rf $${HEADERS_DIR}

@@ -381,7 +381,10 @@ defmodule XLA do
       # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
       "--copt=-Wno-gnu-offsetof-extensions",
       "--copt=-Qunused-arguments",
-      "--copt=-Wno-error=c23-extensions"
+      "--copt=-Wno-error=c23-extensions",
+      # The local Clang toolchain on macOS enables layering checks, which fail
+      # on undeclared dependencies in third-party Bazel modules such as grpc
+      "--features=-layering_check"
     ]
 
     # We need to set HOME for the build, otherwise one of the scripts
