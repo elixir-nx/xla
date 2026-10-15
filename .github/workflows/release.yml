@@ -3,10 +3,16 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: "Release to upload the archives to, for example v0.11.0. It is created as a draft if missing"
+        required: true
+        type: string
 
 env:
   NX_XLA_SHA: ${{ github.sha }}
-  NX_XLA_RELEASE_NAME: ${{ github.ref_name }}
+  NX_XLA_RELEASE_NAME: ${{ inputs.release_name || github.ref_name }}
 
   # Build envs for non-Docker jobs.
   USE_BAZEL_VERSION: 8.7.0
@@ -135,6 +141,13 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip numpy
+      # Homebrew installs OpenSSL headers in /usr/local/include on x86_64,
+      # where clang finds them before BoringSSL's own headers and the
+      # BoringSSL build fails. Move them out of the search path.
+      - run: |
+          if [ -d /usr/local/include/openssl ]; then
+            sudo mv /usr/local/include/openssl /usr/local/include/openssl.disabled
+          fi
       # Build and upload the archive
       - run: mix deps.get
       - run: mix compile
