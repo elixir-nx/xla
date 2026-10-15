@@ -335,7 +335,7 @@ defmodule XLA do
                   ~s/--repo_env=HERMETIC_CUDA_VERSION="12.9.1"/,
                   ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.8.0"/,
                   ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.9"/,
-                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
+                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.30.7"/,
                   ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_50,sm_60,sm_70,sm_80,sm_90,sm_100,compute_120"/
                 ]
 
@@ -345,7 +345,7 @@ defmodule XLA do
                   ~s/--repo_env=HERMETIC_CUDA_VERSION="13.0.0"/,
                   ~s/--repo_env=HERMETIC_CUDNN_VERSION="9.12.0"/,
                   ~s/--repo_env=HERMETIC_NVSHMEM_VERSION="3.3.20"/,
-                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.27.7"/,
+                  ~s/--repo_env=HERMETIC_NCCL_VERSION="2.30.7"/,
                   ~s/--repo_env HERMETIC_CUDA_COMPUTE_CAPABILITIES="sm_75,sm_80,sm_90,sm_100,compute_120"/
                 ]
 
@@ -381,13 +381,25 @@ defmodule XLA do
       # See https://github.com/jax-ml/jax/blob/0842cc6f386a20aa20ed20691fb78a43f6c4a307/.bazelrc#L127-L138
       "--copt=-Wno-gnu-offsetof-extensions",
       "--copt=-Qunused-arguments",
-      "--copt=-Wno-error=c23-extensions"
+      "--copt=-Wno-error=c23-extensions",
+      # The local Clang toolchain on macOS enables layering checks, which fail
+      # on undeclared dependencies in third-party Bazel modules such as grpc
+      "--features=-layering_check"
     ]
 
     # We need to set HOME for the build, otherwise one of the scripts
     # during the build fails, at least on macOS.
     bazel_build_flags_shared =
       ["--action_env=HOME='#{System.get_env("HOME")}'"] ++ bazel_build_flags_shared
+
+    # XLA builds with --spawn_strategy=standalone. On Linux, grpc then picks
+    # up its checked-in upb headers, which its rules do not declare, and Bazel
+    # rejects the compile. Sandboxing hides them.
+    bazel_build_flags_shared =
+      case target_triplet() do
+        {_arch, "linux", _abi} -> ["--strategy=CppCompile=sandboxed"] ++ bazel_build_flags_shared
+        _other -> bazel_build_flags_shared
+      end
 
     bazel_build_flags = Enum.join(bazel_build_flags_accelerator ++ bazel_build_flags_shared, " ")
 
