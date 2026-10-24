@@ -33,7 +33,7 @@ defmodule XLA.Utils do
       end
     end
 
-    opts = [stream: :self, sync: false, receiver: receiver]
+    opts = [stream: :self, sync: false, receiver: receiver, max_header_size: 65_536]
 
     {:ok, request_id} = :httpc.request(:get, request, http_opts, opts, :xla)
 
