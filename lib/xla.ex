@@ -356,8 +356,12 @@ defmodule XLA do
         "rocm" <> _ ->
           [
             "--config=rocm",
-            ~s/--action_env=TF_ROCM_CLANG="1"/,
-            ~s/--action_env=TF_HIPCC_CLANG="1"/,
+            # These must be repo_env (not action_env) so that the
+            # rocm_configure repository rule sees them when generating
+            # the crosstool wrapper. Otherwise the wrapper defaults to
+            # gcc and chokes on Clang-only flags like -Qunused-arguments.
+            ~s/--repo_env=TF_ROCM_CLANG="1"/,
+            ~s|--repo_env=CLANG_COMPILER_PATH="/usr/lib/llvm-18/bin/clang"|,
             # See https://github.com/jax-ml/jax/blob/098e953afb2b83daf85e6456c89e896f9cfd483d/.bazelrc#L239
             # GPU targets: MI200 (gfx90a), MI300 (gfx942), RDNA2 (gfx1030), RDNA3 (gfx1100), RDNA4 (gfx120x)
             # Note: gfx900/906/908 (Vega, MI50/60, MI100) removed - deprecated in ROCm 7.x
